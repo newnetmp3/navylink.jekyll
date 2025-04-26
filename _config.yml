@@ -1,8 +1,12 @@
 title: Navylink
+
+# Set a path/url to a logo that will be displayed instead of the title
+logo: "/assets/site_images/nlink_logo_clr.png"
+
 description: All the links for the chain
 theme: just-the-docs
 
-url: https://navylink.net
+url: https://www.navylink.net
 
 aux_links:
   Template Repository: https://github.com/just-the-docs/just-the-docs-template
