@@ -1,7 +1,7 @@
 title: Navylink
 
 # Set a path/url to a logo that will be displayed instead of the title
-# logo: "/assets/site_images/nlink_logo_clr.png"
+logo: "assets/site_images/nlink_logo_clr.png"
 
 description: All the links for the chain
 theme: just-the-docs
