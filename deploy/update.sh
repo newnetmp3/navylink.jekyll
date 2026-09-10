@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+APP_DIR="/opt/navylink"
+cd "$APP_DIR"
+
+git fetch --all --prune
+git reset --hard origin/main
+./.venv/bin/pip install -r server/requirements.txt
+bundle install
+bundle exec jekyll build
+
+systemctl restart navylink
+caddy validate --config /etc/caddy/Caddyfile
+systemctl reload caddy
+
+echo "Waiting for Navylink API..."
+for attempt in {1..20}; do
+  if curl -fsS http://127.0.0.1:8000/api/health; then
+    echo
+    echo "Navylink update complete."
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "Navylink API did not become healthy within 20 seconds." >&2
+systemctl --no-pager --full status navylink.service >&2 || true
+journalctl -u navylink.service -n 40 --no-pager >&2 || true
+exit 1
