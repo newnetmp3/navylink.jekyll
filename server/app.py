@@ -30,7 +30,7 @@ def slugify(value: str) -> str:
 
 def load_catalog() -> dict[str, dict[str, Any]]:
     items: list[dict[str, Any]] = []
-    for name in ("quick_links.yml", "extra_links.yml"):
+    for name in ("quick_links.yml", "extra_links.yml", "mnp_quick_links.generated.yml"):
         path = DATA_DIR / name
         if path.exists():
             with path.open("r", encoding="utf-8") as fh:
