@@ -15,12 +15,14 @@
   let favoritesOnly = false;
   let favorites = new Set(JSON.parse(localStorage.getItem(favoriteKey) || '[]'));
   let usage = {};
+  let serverTracking = false;
 
   cards.forEach((card, index) => card.dataset.originalIndex = index);
 
   function normalize(v) { return (v || '').toLowerCase().trim(); }
   function saveFavorites() { localStorage.setItem(favoriteKey, JSON.stringify([...favorites])); }
   function uses(id) { return Number(usage[id] || 0); }
+  function trackedUrl(id, fallback) { return serverTracking ? `/api/go/${encodeURIComponent(id)}` : fallback; }
 
   function renderStars() {
     document.querySelectorAll('.star').forEach(btn => {
@@ -42,9 +44,7 @@
     });
   }
 
-  function renderOrder() {
-    sortedCards().forEach(card => grid.appendChild(card));
-  }
+  function renderOrder() { sortedCards().forEach(card => grid.appendChild(card)); }
 
   function renderMostUsed() {
     const ranked = [...cards].sort((a, b) => {
@@ -58,12 +58,11 @@
     mostUsed.innerHTML = '';
     ranked.forEach(card => {
       const a = document.createElement('a');
-      a.href = card.dataset.url;
+      a.href = trackedUrl(card.dataset.id, card.dataset.url);
       a.dataset.id = card.dataset.id;
       a.className = 'most-used-link';
       const n = uses(card.dataset.id);
       a.innerHTML = `<span>${card.dataset.name}</span><small>${n ? `${n.toLocaleString()} open${n === 1 ? '' : 's'}` : 'Starter shortcut'}</small>`;
-      a.addEventListener('click', () => recordUse(card.dataset.id));
       mostUsed.appendChild(a);
     });
   }
@@ -77,12 +76,18 @@
       const response = await fetch('/api/stats', { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
+      serverTracking = true;
       usage = {};
       for (const item of (data.links || [])) usage[item.id] = Number(item.total || 0);
+      document.querySelectorAll('.tracked-link').forEach(link => {
+        const card = cards.find(c => c.dataset.id === link.dataset.id);
+        if (card) link.href = trackedUrl(link.dataset.id, card.dataset.url);
+      });
       renderMostUsed();
       if (sortSelect.value === 'usage') filter();
     } catch (err) {
-      console.warn('[Navylink] Global usage API unavailable; using starter ranking.', err);
+      serverTracking = false;
+      console.warn('[Navylink] Global usage API unavailable; direct links remain enabled.', err);
       renderMostUsed();
     } finally {
       if (refreshUsage) {
@@ -92,31 +97,9 @@
     }
   }
 
-  function transmitUse(id) {
-    const url = `/api/click/${encodeURIComponent(id)}`;
-    if (typeof navigator.sendBeacon === 'function') {
-      const sent = navigator.sendBeacon(url, '');
-      if (sent) return;
-    }
-    fetch(url, {
-      method: 'POST',
-      keepalive: true,
-      headers: { 'Accept': 'application/json' }
-    }).catch(err => console.warn('[Navylink] Click count was not recorded.', err));
-  }
-
-  function recordUse(id) {
-    if (!id) return;
-    usage[id] = uses(id) + 1;
-    renderMostUsed();
-    if (sortSelect.value === 'usage') renderOrder();
-    transmitUse(id);
-  }
-
   function openCard(card) {
     if (!card?.dataset.url || !card.dataset.id) return;
-    recordUse(card.dataset.id);
-    window.location.href = card.dataset.url;
+    window.location.href = trackedUrl(card.dataset.id, card.dataset.url);
   }
 
   function filter() {
@@ -153,10 +136,7 @@
     filter();
   }));
 
-  document.querySelectorAll('.tracked-link').forEach(link => link.addEventListener('click', event => {
-    event.stopPropagation();
-    recordUse(link.dataset.id);
-  }));
+  document.querySelectorAll('.tracked-link').forEach(link => link.addEventListener('click', event => event.stopPropagation()));
 
   cards.forEach(card => {
     card.addEventListener('click', event => {
