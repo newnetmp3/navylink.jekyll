@@ -2,13 +2,6 @@ name: Sync MyNavy Portal Quick Links
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 8 * * *'
-  push:
-    paths:
-      - 'tools/sync_mnp_quicklinks.py'
-      - 'server/requirements.txt'
-      - '.github/workflows/sync-mnp-quicklinks.yml'
 
 permissions:
   contents: write
@@ -23,12 +16,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
