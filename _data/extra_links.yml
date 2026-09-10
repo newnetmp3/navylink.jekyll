@@ -1,0 +1,90 @@
+- name: Joint Knowledge Online (JKO)
+  url: https://www.jcs.mil/JKO/
+  category: Training & Education
+  tags: jko joint knowledge online training courses
+  description: Joint Knowledge Online training and distributed learning resources.
+  cac: false
+- name: Thrift Savings Plan (TSP)
+  url: https://www.tsp.gov/
+  category: Pay & Benefits
+  tags: tsp retirement savings matching investment blended retirement
+  description: Federal retirement savings account management and TSP information.
+  cac: false
+- name: United Services Military Apprenticeship Program (USMAP)
+  url: https://usmap.osd.mil/
+  category: Training & Education
+  tags: usmap apprenticeship journeyman trade credentials hours
+  description: Document military work experience toward Department of Labor apprenticeship credentials.
+  cac: false
+- name: Navy Digital Library
+  url: https://mwrdigitallibrary.navy.mil/
+  category: Training & Education
+  tags: library ebooks audiobooks research test preparation mwr
+  description: Navy MWR digital books, audiobooks, research databases and learning resources.
+  cac: false
+- name: Navy Awards / NDAWS Information
+  url: https://www.mynavyhr.navy.mil/Career-Management/Records-Management/Decorations-and-Medals/
+  category: Records & Admin
+  tags: ndaws awards decorations medals ompf citations ribbons
+  description: Official Navy awards guidance and NDAWS information. NDAWS itself is accessed through BOL.
+  cac: false
+- name: Navy Advancement Center
+  url: https://www.netc.navy.mil/Commands/Naval-Education-and-Training-Professional-Development-Center/Navy-Advancement-Center/
+  category: Career & Orders
+  tags: advancement exam profile sheet quotas bibliographies nac
+  description: Navy enlisted advancement exam, cycle, quota and advancement resources.
+  cac: false
+- name: milSuite
+  url: https://www.milsuite.mil/
+  category: Tools
+  tags: milsuite milbook milwiki collaboration dod communities
+  description: DoD professional collaboration communities, knowledge sharing and resources.
+  cac: true
+- name: Navy MWR
+  url: https://www.navymwr.org/
+  category: Family & Support
+  tags: mwr recreation fitness liberty tickets lodging quality of life
+  description: Navy Morale, Welfare and Recreation programs and installation services.
+  cac: false
+- name: Navy Exchange (NEX)
+  url: https://www.mynavyexchange.com/
+  category: Family & Support
+  tags: nex exchange shopping uniforms services
+  description: Navy Exchange shopping, uniform and installation service information.
+  cac: false
+- name: Navy Housing
+  url: https://ffr.cnic.navy.mil/Navy-Housing/
+  category: Travel & PCS
+  tags: housing pcs barracks family housing rental community
+  description: Navy housing resources for military family housing, barracks and community rentals.
+  cac: false
+- name: Navy Child & Youth Programs
+  url: https://www.navycyp.org/
+  category: Family & Support
+  tags: child care youth cdc school age family
+  description: Navy child care, youth programs and enrollment resources.
+  cac: false
+- name: CNIC
+  url: https://www.cnic.navy.mil/
+  category: References
+  tags: cnic installations shore command base services
+  description: Commander, Navy Installations Command information and installation resources.
+  cac: false
+- name: Joint Travel Regulations (JTR)
+  url: https://www.travel.dod.mil/Policy-Regulations/Joint-Travel-Regulations/
+  category: Travel & PCS
+  tags: jtr travel entitlement per diem pcs tdy regulation
+  description: Current DoD Joint Travel Regulations and travel entitlement policy.
+  cac: false
+- name: Defense Personal Property System (DPS)
+  url: https://dps.move.mil/cust/standard/user/home.xhtml
+  category: Travel & PCS
+  tags: dps household goods pcs move shipment hhg
+  description: Manage PCS household-goods shipments and personal property moves.
+  cac: true
+- name: Federal Voting Assistance Program
+  url: https://www.fvap.gov/
+  category: Family & Support
+  tags: voting absentee ballot election military overseas
+  description: Voting assistance for service members, families and overseas citizens.
+  cac: false
