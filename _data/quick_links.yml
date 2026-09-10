@@ -1,263 +1,347 @@
 - name: MyNavy Portal
   url: https://www.mn3p.navy.mil/
-  category: Popular
-  tags: portal mnp sailor career
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: portal mnp sailor career dashboard gateway directory
   description: MyNavy Portal home and Sailor landing page.
   cac: false
   featured: true
 - name: MyNavy Quick Links
   url: https://www.mn3p.navy.mil/quick-links
-  category: Popular
-  tags: official quick links directory
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: official quick links directory portal index resources
   description: Official searchable MyNavy Portal Quick Links database.
   cac: false
   featured: true
 - name: NSIPS
   url: https://www.nsips.cloud.navy.mil/my.policy
+  group: Career & Personnel
   category: Records & Admin
-  tags: esr leave dependency emergency data personnel
+  kind: direct
+  tags: esr leave dependency emergency data personnel service record eLeave
   description: Electronic Service Record, personnel self-service, eLeave and related actions.
   cac: true
   featured: true
 - name: BUPERS Online (BOL)
   url: https://www.bol.navy.mil/bam/
+  group: Career & Personnel
   category: Records & Admin
-  tags: bol ompf psr continuity report records
+  kind: direct
+  tags: bol ompf psr continuity report records awards ndaws profile sheet
   description: Personnel records, OMPF, PSR, reports and other BUPERS services.
   cac: true
   featured: true
 - name: MyNavy Assignment
   url: https://mynavyassignment.dc3n.navy.mil/
+  group: Career & Personnel
   category: Career & Orders
-  tags: mna orders detailing billets assignment jobs
+  kind: direct
+  tags: mna orders detailing billets assignment jobs marketplace negotiation
   description: View available assignments and submit applications.
   cac: true
   featured: true
 - name: MyNavy HR
   url: https://www.mynavyhr.navy.mil/
-  category: Career & Orders
-  tags: npc bupers policy career community management
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: npc bupers policy career community management personnel directory
   description: Navy personnel policy, career management, references and community information.
   cac: false
   featured: true
 - name: Navy eLearning
   url: https://learning.nel.navy.mil/ELIAASv2p/
+  group: Training & Education
   category: Training & Education
-  tags: nel training courses gmt pme schoolhouse
+  kind: direct
+  tags: nel training courses gmt pme schoolhouse online learning
   description: Navy online training, PME, GMT and course catalog.
   cac: true
   featured: true
 - name: Navy COOL
   url: https://www.cool.osd.mil/usn/
-  category: Training & Education
-  tags: credentials certifications ladders bibs advancement
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: credentials certifications ladders ladr bibs advancement credentialing
   description: Credentials, certifications, LaDRs and advancement bibliographies.
   cac: false
   featured: true
 - name: Navy College
   url: https://www.navycollege.navy.mil/
-  category: Training & Education
-  tags: tuition assistance education ta college degree
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: tuition assistance education ta college degree voluntary education
   description: Tuition Assistance and Navy higher-education resources.
   cac: false
 - name: Joint Services Transcript
-  url: https://jst.doded.mil/
-  category: Training & Education
-  tags: jst transcript credits education military training
+  url: https://jst.doded.mil/jst/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: jst transcript credits education military training ace
   description: Official military training and education transcript.
   cac: true
 - name: NETC
   url: https://www.netc.navy.mil/
-  category: Training & Education
-  tags: naval education training command school courses
-  description: Naval Education and Training Command resources and school information.
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: naval education training command school courses training directory
+  description: Naval Education and Training Command portal and training-resource directory.
   cac: false
 - name: NTMPS / FLTMPS
   url: https://ntmpsweb.dc3n.navy.mil/
+  group: Training & Education
   category: Training & Education
-  tags: fltmps ntmps etj training readiness
+  kind: direct
+  tags: fltmps ntmps etj training readiness management
   description: Training-management resources; some services require DODIN access.
   cac: true
   dodin: true
 - name: Navy App Locker
   url: https://www.applocker.navy.mil/
-  category: Tools
-  tags: apps mobile navy apps
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: apps mobile navy apps directory catalog
   description: Official Navy mobile app catalog.
   cac: false
 - name: Navy Forms
-  url: https://www.secnav.navy.mil/doni/Pages/SECNAV-Forms.aspx
-  category: References
-  tags: forms secnav don navy forms
-  description: Department of the Navy forms repository.
+  url: https://www.mynavyhr.navy.mil/References/Forms/
+  group: Policy & References
+  category: Forms & Directives
+  kind: hub
+  tags: forms navpers nppsc secnav dd forms repository
+  description: Official MyNavy HR forms index for NAVPERS, NPPSC and related forms.
   cac: false
-- name: Navy Directives
+- name: Department of the Navy Issuances (DONI)
   url: https://www.secnav.navy.mil/doni/default.aspx
-  category: References
-  tags: instructions notices secnav opnav directives doni
-  description: Department of the Navy Issuances and directives.
+  group: Policy & References
+  category: Forms & Directives
+  kind: hub
+  tags: instructions notices secnav opnav directives doni issuances
+  description: Official repository for SECNAV and OPNAV directives and issuances.
   cac: false
 - name: MILPERSMAN
   url: https://www.mynavyhr.navy.mil/References/MILPERSMAN/
+  group: Policy & References
   category: References
-  tags: milpersman personnel policy references
+  kind: direct
+  tags: milpersman personnel policy manual articles references
   description: Naval Military Personnel Manual articles and policy.
   cac: false
 - name: NAVADMIN Library
   url: https://www.mynavyhr.navy.mil/References/Messages/NAVADMIN-2026/
+  group: Policy & References
   category: References
-  tags: navadmin messages policy announcements
+  kind: direct
+  tags: navadmin messages policy announcements current year
   description: Current-year NAVADMIN messages from MyNavy HR.
   cac: false
 - name: ALNAV Library
   url: https://www.mynavyhr.navy.mil/References/Messages/ALNAV-2026/
+  group: Policy & References
   category: References
-  tags: alnav messages announcements
+  kind: direct
+  tags: alnav messages announcements current year
   description: Current-year ALNAV messages from MyNavy HR.
   cac: false
 - name: Navy Uniform Regulations
   url: https://www.mynavyhr.navy.mil/References/US-Navy-Uniforms/Uniform-Regulations/
+  group: Policy & References
   category: References
-  tags: uniform regulations grooming appearance
+  kind: direct
+  tags: uniform regulations grooming appearance navpers 15665
   description: Official Navy Uniform Regulations and appearance guidance.
   cac: false
 - name: myPay
   url: https://mypay.dfas.mil/#/
+  group: Pay, Benefits & Travel
   category: Pay & Benefits
-  tags: dfas les taxes pay allotments w2
+  kind: direct
+  tags: dfas les taxes pay allotments w2 military pay
   description: LES, tax statements, allotments and military pay account management.
   cac: false
   featured: true
 - name: DFAS Military Pay
   url: https://www.dfas.mil/militarymembers/
+  group: Pay, Benefits & Travel
   category: Pay & Benefits
-  tags: dfas pay entitlements military pay
+  kind: hub
+  tags: dfas pay entitlements military pay information
   description: DFAS military pay information, entitlements and support.
   cac: false
 - name: milConnect
   url: https://milconnect.dmdc.osd.mil/milconnect/
+  group: Pay, Benefits & Travel
   category: Pay & Benefits
-  tags: deers sgli benefits dmdc records dependents
+  kind: direct
+  tags: deers sgli benefits dmdc records dependents soes vmet
   description: Manage benefits, DEERS-linked information, SGLI and DoD records.
   cac: false
 - name: TRICARE
   url: https://www.tricare.mil/
+  group: Readiness & Health
   category: Health & Readiness
-  tags: medical health dental benefits tricare
+  kind: hub
+  tags: medical health dental benefits tricare care plans referrals
   description: Military health benefits, plans, referrals and care resources.
   cac: false
 - name: MRRS
   url: https://mrrs.dc3n.navy.mil/mrrs/secure/welcome.m
+  group: Readiness & Health
   category: Health & Readiness
+  kind: direct
   tags: medical readiness immunization dental mrrs
   description: Medical Readiness Reporting System.
   cac: true
 - name: PRIMS / PFA
   url: https://www.mn3p.navy.mil/web/performance/prims
+  group: Readiness & Health
   category: Health & Readiness
-  tags: prims pfa prt fitness parfq
+  kind: direct
+  tags: prims pfa prt fitness parfq physical readiness
   description: Physical readiness, PFA and PRIMS resources through MyNavy Portal.
   cac: true
 - name: NFAAS
   url: https://navyfamily.navy.mil/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: nfaas accountability disaster family
+  kind: direct
+  tags: nfaas accountability disaster family emergency
   description: Navy Family Accountability and Assessment System.
   cac: false
 - name: Fleet & Family Support
   url: https://ffr.cnic.navy.mil/Family-Readiness/Fleet-And-Family-Support-Program/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: ffsc family readiness counseling relocation
+  kind: hub
+  tags: ffsc family readiness counseling relocation spouse support
   description: Fleet and Family Support programs, relocation and counseling resources.
   cac: false
 - name: Military OneSource
   url: https://www.militaryonesource.mil/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: family support pcs financial counseling military life
+  kind: hub
+  tags: family support pcs financial counseling military life dod
   description: DoD support for military life, families, moves, finances and more.
   cac: false
 - name: RAPIDS ID Card Office
   url: https://idco.dmdc.osd.mil/idco/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: cac id card deers rapids appointment
+  kind: direct
+  tags: cac id card deers rapids appointment idco
   description: ID card office locator and appointment scheduling.
   cac: false
 - name: Defense Travel System (DTS)
   url: https://dtsproweb.defensetravel.osd.mil/dts-app/pubsite/all/first
+  group: Pay, Benefits & Travel
   category: Travel & PCS
-  tags: dts travel voucher authorization tdy
+  kind: direct
+  tags: dts travel voucher authorization tdy orders reservations
   description: Official DoD travel authorizations, reservations and vouchers.
   cac: true
   featured: true
 - name: Defense Travel Management Office
   url: https://www.travel.dod.mil/
+  group: Pay, Benefits & Travel
   category: Travel & PCS
-  tags: dtmo jtr per diem travel policy
+  kind: hub
+  tags: dtmo jtr per diem travel policy allowances
   description: Travel policy, per diem, JTR and DTS support resources.
   cac: false
 - name: Military OneSource Moving
   url: https://www.militaryonesource.mil/moving-housing/moving/
+  group: Pay, Benefits & Travel
   category: Travel & PCS
+  kind: hub
   tags: pcs move household goods housing relocation
   description: PCS and household-goods moving resources.
   cac: false
 - name: Military Installations
   url: https://installations.militaryonesource.mil/
-  category: Travel & PCS
-  tags: base installation pcs housing services
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: base installation pcs housing services directory locator
   description: Installation-specific services, contacts and relocation information.
   cac: false
 - name: MyNavy Career Center
   url: https://www.mynavyhr.navy.mil/Support-Services/MyNavy-Career-Center/
-  category: Help & Support
-  tags: mncc help ticket personnel pay support
+  group: Career & Personnel
+  category: Records & Admin
+  kind: direct
+  tags: mncc help ticket personnel pay support hr case
   description: MyNavy Career Center support for HR, pay and personnel issues.
   cac: false
 - name: Navy Enterprise Service Desk
   url: https://www.navy311.navy.mil/
-  category: Help & Support
-  tags: nesd navy 311 it help desk support
+  group: Tools & IT
+  category: IT & Enterprise Services
+  kind: direct
+  tags: nesd navy 311 it help desk support enterprise
   description: Navy IT and enterprise support resources.
   cac: false
 - name: DoD SAFE
   url: https://safe.apps.mil/
+  group: Tools & IT
   category: Tools
-  tags: file transfer safe dod files upload
+  kind: direct
+  tags: file transfer safe dod files upload secure exchange
   description: Secure DoD file exchange for approved use.
   cac: true
 - name: DoD Global Directory
   url: https://dod411.gds.disa.mil/
+  group: Tools & IT
   category: Tools
-  tags: global directory email phone contact disa
+  kind: direct
+  tags: global directory email phone contact disa dod411
   description: DoD enterprise directory and contact lookup.
   cac: true
 - name: Navy Reserve Homeport
   url: https://www.navyreserve.navy.mil/
+  group: Reserve
   category: Reserve
-  tags: reserve navy reserve homeport drilling
+  kind: hub
+  tags: reserve navy reserve homeport drilling selres tar
   description: Navy Reserve news, resources and command information.
   cac: false
 - name: Navy Reserve Forces Command
   url: https://www.navyreserve.navy.mil/Commands/Navy-Reserve-Force/
+  group: Reserve
   category: Reserve
-  tags: reserve force cnrfc commands
+  kind: hub
+  tags: reserve force cnrfc commands selres force
   description: Navy Reserve Force command resources.
   cac: false
 - name: SkillBridge
   url: https://skillbridge.osd.mil/
+  group: Recruiting & Transition
   category: Transition
-  tags: transition separation civilian internship employment
+  kind: direct
+  tags: transition separation civilian internship employment skillbridge
   description: DoD SkillBridge transition opportunities and program information.
   cac: false
 - name: VA.gov
   url: https://www.va.gov/
+  group: Recruiting & Transition
   category: Transition
-  tags: veterans benefits disability health transition
+  kind: direct
+  tags: veterans benefits disability health transition va
   description: Department of Veterans Affairs benefits and services.
   cac: false
 - name: Transition Assistance Program
   url: https://www.dodtap.mil/
+  group: Recruiting & Transition
   category: Transition
-  tags: tap transition separation retirement civilian
+  kind: direct
+  tags: tap transition separation retirement civilian dodtap vmet
   description: DoD Transition Assistance Program resources.
   cac: false
