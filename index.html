@@ -74,7 +74,8 @@ title: Navylink
   </div>
 
   <section id="link-grid" class="link-grid" aria-label="Navy and DoD links">
-    {% for link in site.data.quick_links %}
+    {% assign all_links = site.data.quick_links | concat: site.data.extra_links %}
+    {% for link in all_links %}
     {% assign sid = link.name | slugify %}
     <article class="link-card" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-category="{{ link.category }}" data-search="{{ link.name }} {{ link.category }} {{ link.tags }} {{ link.description }}">
       <div class="card-top">
