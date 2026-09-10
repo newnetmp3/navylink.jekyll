@@ -10,7 +10,7 @@ title: Navylink
   <meta name="theme-color" content="#071a2f">
   <meta name="description" content="A fast, organized launchpad for U.S. Navy and DoD web resources.">
   <title>Navylink — Navy Quick Links, Organized</title>
-  <link rel="stylesheet" href="{{ '/assets/css/navylink.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/navylink.css' | relative_url }}?v=20260910-2">
   <link rel="stylesheet" href="{{ '/assets/css/navylink-usage.css' | relative_url }}">
 </head>
 <body>
@@ -31,22 +31,46 @@ title: Navylink
       <div>
         <div class="eyebrow">Sailor web launchpad</div>
         <h1>Less hunting.<br>More getting things done.</h1>
-        <p class="hero-copy">Navy and DoD links organized around the tasks Sailors actually do: records, orders, pay, training, readiness, travel, family support and transition.</p>
+        <p class="hero-copy">Official Navy and DoD resources organized by the work Sailors actually do, with broad portal/index pages separated from direct destination systems.</p>
         <div class="search-wrap">
           <span class="search-icon" aria-hidden="true">⌕</span>
           <label class="hidden" for="link-search">Search Navy links</label>
-          <input id="link-search" class="search" type="search" autocomplete="off" placeholder="Search by system, task, acronym, or topic…">
+          <input id="link-search" class="search" type="search" autocomplete="off" placeholder="Search system, task, acronym, policy, benefit, or topic…">
           <span class="kbd" aria-hidden="true">/</span>
         </div>
       </div>
       <aside class="hero-note">
         <strong>CAC & network-aware</strong>
-        <p>Links that commonly require CAC are clearly marked. DODIN-only resources are called out separately so you know before you click.</p>
+        <p>Links that commonly require CAC are marked. DODIN-only resources are called out separately. Directory-style pages are labeled as hubs.</p>
       </aside>
     </div>
   </div>
 </header>
 <main id="main" class="main shell">
+  <nav class="resource-nav" aria-label="Navy resource hierarchy">
+    <button class="nav-home nav-filter active" type="button" data-group="All" data-category="All" data-kind="all">All resources</button>
+    {% for group in site.data.taxonomy %}
+    <details class="nav-menu">
+      <summary>{{ group.name }}</summary>
+      <div class="nav-menu-panel">
+        <button class="nav-group-button nav-filter" type="button" data-group="{{ group.name }}" data-category="All" data-kind="all">All {{ group.name }}</button>
+        {% for cat in group.categories %}
+        <button class="nav-filter" type="button" data-group="{{ group.name }}" data-category="{{ cat }}" data-kind="all">{{ cat }}</button>
+        {% endfor %}
+      </div>
+    </details>
+    {% endfor %}
+    <details class="nav-menu nav-type-menu">
+      <summary>Resource type</summary>
+      <div class="nav-menu-panel nav-menu-panel-right">
+        <button class="nav-filter" type="button" data-group="All" data-category="All" data-kind="direct">Direct destinations</button>
+        <button class="nav-filter" type="button" data-group="All" data-category="All" data-kind="hub">Portals & directories</button>
+      </div>
+    </details>
+  </nav>
+
+  <div id="active-filter" class="active-filter" aria-live="polite">Showing all resources</div>
+
   <section class="most-used-panel" aria-labelledby="most-used-title">
     <div class="most-used-head">
       <div><strong id="most-used-title">Most used</strong><small>Ranked by aggregate outgoing clicks across Navylink</small></div>
@@ -56,12 +80,12 @@ title: Navylink
   </section>
 
   <div class="section-head">
-    <div><h2>Find what you need</h2><p>Alphabetical by default. Filter by mission area or type exactly what you are trying to accomplish.</p></div>
+    <div><h2>Find what you need</h2><p>Use the hierarchy above, search by task or acronym, or narrow by category below.</p></div>
   </div>
 
   <div class="category-strip" role="group" aria-label="Filter links by category">
-    {% assign categories = "All,Popular,Records & Admin,Career & Orders,Pay & Benefits,Training & Education,Health & Readiness,Travel & PCS,Family & Support,References,Tools,Help & Support,Reserve,Transition" | split: "," %}
-    {% for cat in categories %}<button class="chip{% if cat == 'All' %} active{% endif %}" type="button" data-category="{{ cat }}">{{ cat }}</button>{% endfor %}
+    <button class="chip active" type="button" data-category="All">All</button>
+    {% for group in site.data.taxonomy %}{% for cat in group.categories %}<button class="chip" type="button" data-category="{{ cat }}">{{ cat }}</button>{% endfor %}{% endfor %}
   </div>
 
   <div class="toolbar">
@@ -77,7 +101,7 @@ title: Navylink
     {% assign all_links = site.data.quick_links | concat: site.data.extra_links %}
     {% for link in all_links %}
     {% assign sid = link.name | slugify %}
-    <article class="link-card" role="link" tabindex="0" aria-label="Open {{ link.name }}" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-category="{{ link.category }}" data-search="{{ link.name }} {{ link.category }} {{ link.tags }} {{ link.description }}">
+    <article class="link-card" role="link" tabindex="0" aria-label="Open {{ link.name }}" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-group="{{ link.group | default: link.category | escape }}" data-category="{{ link.category | escape }}" data-kind="{{ link.kind | default: 'direct' }}" data-search="{{ link.name }} {{ link.group }} {{ link.category }} {{ link.tags }} {{ link.description }}">
       <div class="card-top">
         <div>
           <h3>{{ link.name }}</h3>
@@ -86,7 +110,9 @@ title: Navylink
         <button class="star" type="button" data-id="{{ sid }}" aria-label="Save {{ link.name }} as favorite" aria-pressed="false">☆</button>
       </div>
       <div class="badges">
+        <span class="badge group">{{ link.group }}</span>
         <span class="badge">{{ link.category }}</span>
+        {% if link.kind == 'hub' %}<span class="badge hub">Directory / Hub</span>{% endif %}
         {% if link.cac %}<span class="badge cac">🔒 CAC</span>{% endif %}
         {% if link.dodin %}<span class="badge dodin">DODIN</span>{% endif %}
       </div>
@@ -98,7 +124,7 @@ title: Navylink
 
   <section class="info-grid" aria-label="Navylink notes">
     <div class="info-card warning"><h3>Before entering credentials</h3><p>Navylink is a convenience directory, not an authentication provider. Confirm the destination domain and certificate before entering credentials, personal information, or using your CAC.</p></div>
-    <div class="info-card"><h3>Official source of record</h3><p>MyNavy Portal maintains a searchable Quick Links database with hundreds of resources. Use the official MNP directory when you need the authoritative current listing.</p></div>
+    <div class="info-card"><h3>Directories are separated</h3><p>Broad landing pages and link indexes are marked <strong>Directory / Hub</strong>. Use the Resource type menu to show only direct destinations when you want to skip intermediary pages.</p></div>
   </section>
 </main>
 <footer class="footer">
@@ -107,6 +133,6 @@ title: Navylink
     <div><a class="tracked-link" data-id="mynavy-quick-links" href="/api/go/mynavy-quick-links">Official MNP Quick Links</a><br><a class="tracked-link" data-id="mynavy-hr" href="/api/go/mynavy-hr">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
   </div>
 </footer>
-<script src="{{ '/assets/js/navylink.js' | relative_url }}?v=20260910-1" defer></script>
+<script src="{{ '/assets/js/navylink.js' | relative_url }}?v=20260910-2" defer></script>
 </body>
 </html>
