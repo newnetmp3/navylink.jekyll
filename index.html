@@ -46,17 +46,16 @@ title: Navylink
   </div>
 </header>
 <main id="main" class="main shell">
-  <nav class="quickbar" aria-label="Most used Navy links">
-    <a href="https://www.nsips.cloud.navy.mil/my.policy"><span>NSIPS</span><small>ESR · Leave</small></a>
-    <a href="https://www.bol.navy.mil/bam/"><span>BOL</span><small>OMPF · PSR</small></a>
-    <a href="https://mynavyassignment.dc3n.navy.mil/"><span>MNA</span><small>Orders · Billets</small></a>
-    <a href="https://mypay.dfas.mil/#/"><span>myPay</span><small>LES · Taxes</small></a>
-    <a href="https://learning.nel.navy.mil/ELIAASv2p/"><span>Navy eLearning</span><small>Training · GMT</small></a>
-    <a href="https://dtsproweb.defensetravel.osd.mil/dts-app/pubsite/all/first"><span>DTS</span><small>TDY · Vouchers</small></a>
-  </nav>
+  <section class="most-used-panel" aria-labelledby="most-used-title">
+    <div class="most-used-head">
+      <div><strong id="most-used-title">Most used</strong><small>Ranked by outgoing links opened on this device</small></div>
+      <button id="reset-usage" class="usage-reset" type="button" title="Clear local usage counts">Reset counts</button>
+    </div>
+    <nav id="most-used-links" class="quickbar" aria-label="Most used Navy links"></nav>
+  </section>
 
   <div class="section-head">
-    <div><h2>Find what you need</h2><p>Filter by mission area or type exactly what you are trying to accomplish.</p></div>
+    <div><h2>Find what you need</h2><p>Alphabetical by default. Filter by mission area or type exactly what you are trying to accomplish.</p></div>
   </div>
 
   <div class="category-strip" role="group" aria-label="Filter links by category">
@@ -67,15 +66,16 @@ title: Navylink
   <div class="toolbar">
     <div id="result-count" class="result-count" aria-live="polite"></div>
     <div class="toolbar-actions">
+      <label class="sort-label" for="sort-links">Sort <select id="sort-links" class="sort-select"><option value="alpha" selected>A–Z</option><option value="usage">Most used</option><option value="category">Category</option><option value="curated">Curated</option></select></label>
       <button id="favorites-only" class="toolbtn" type="button" aria-pressed="false">☆ Favorites</button>
       <button id="clear-filters" class="toolbtn" type="button">Reset</button>
     </div>
   </div>
 
-  <section class="link-grid" aria-label="Navy and DoD links">
+  <section id="link-grid" class="link-grid" aria-label="Navy and DoD links">
     {% for link in site.data.quick_links %}
     {% assign sid = link.name | slugify %}
-    <article class="link-card" data-id="{{ sid }}" data-category="{{ link.category }}" data-search="{{ link.name }} {{ link.category }} {{ link.tags }} {{ link.description }}">
+    <article class="link-card" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-category="{{ link.category }}" data-search="{{ link.name }} {{ link.category }} {{ link.tags }} {{ link.description }}">
       <div class="card-top">
         <div>
           <h3>{{ link.name }}</h3>
@@ -88,7 +88,7 @@ title: Navylink
         {% if link.cac %}<span class="badge cac">🔒 CAC</span>{% endif %}
         {% if link.dodin %}<span class="badge dodin">DODIN</span>{% endif %}
       </div>
-      <div class="card-actions"><a class="launch" href="{{ link.url }}">Open site →</a></div>
+      <div class="card-actions"><a class="launch tracked-link" data-id="{{ sid }}" href="{{ link.url }}">Open site →</a></div>
     </article>
     {% endfor %}
   </section>
@@ -96,13 +96,13 @@ title: Navylink
 
   <section class="info-grid" aria-label="Navylink notes">
     <div class="info-card warning"><h3>Before entering credentials</h3><p>Navylink is a convenience directory, not an authentication provider. Confirm the destination domain and certificate before entering credentials, personal information, or using your CAC.</p></div>
-    <div class="info-card"><h3>Official source of record</h3><p>MyNavy Portal now maintains a searchable Quick Links database with hundreds of resources. Use the official MNP directory when you need the authoritative current listing.</p></div>
+    <div class="info-card"><h3>Official source of record</h3><p>MyNavy Portal maintains a searchable Quick Links database with hundreds of resources. Use the official MNP directory when you need the authoritative current listing.</p></div>
   </section>
 </main>
 <footer class="footer">
   <div class="shell footer-grid">
-    <div><strong>Navylink</strong><p>A streamlined directory for commonly used Navy and DoD services. Built for speed on desktop, tablet and mobile.</p><div class="legal">Links reviewed September 2026. External systems may change without notice.</div></div>
-    <div><a href="https://www.mn3p.navy.mil/quick-links">Official MNP Quick Links</a><br><a href="https://www.mynavyhr.navy.mil/">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
+    <div><strong>Navylink</strong><p>A streamlined directory for commonly used Navy and DoD services. Built for speed on desktop, tablet and mobile.</p><div class="legal">Links reviewed September 2026. External systems may change without notice. Usage counts are stored only in this browser.</div></div>
+    <div><a class="tracked-link" data-id="mynavy-quick-links" href="https://www.mn3p.navy.mil/quick-links">Official MNP Quick Links</a><br><a class="tracked-link" data-id="mynavy-hr" href="https://www.mynavyhr.navy.mil/">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
   </div>
 </footer>
 <script src="{{ '/assets/js/navylink.js' | relative_url }}" defer></script>
