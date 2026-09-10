@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import math
 import re
 import sys
@@ -14,12 +15,12 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "_data"
-OUTPUT = DATA_DIR / "mnp_quick_links.generated.yml"
-META = DATA_DIR / "mnp_quick_links.meta.yml"
+OUTPUT = DATA_DIR / "mnp_quick_links_generated.yml"
+META = DATA_DIR / "mnp_quick_links_meta.yml"
 SEARCH_URL = "https://www.mn3p.navy.mil/web/guest/search"
 QUICK_LINK_TYPE = "com.liferay.object.model.ObjectDefinition#11047502"
 DELTA = 60
-USER_AGENT = "Navylink-MNP-Sync/1.0 (+https://navylink.net/)"
+USER_AGENT = "Navylink-MNP-Sync/1.1 (+https://navylink.net/)"
 
 GROUP_MAP = [
     ("Advancement & Promotion", "Career & Personnel", "Advancement & Boards"),
@@ -48,6 +49,12 @@ def clean_space(value: str) -> str:
     return re.sub(r"\s+", " ", value or "").strip()
 
 
+def slugify(value: str) -> str:
+    value = value.strip().lower()
+    value = re.sub(r"[^a-z0-9]+", "-", value)
+    return value.strip("-")
+
+
 def canonical_url(value: str) -> str:
     value = clean_space(value)
     if not value:
@@ -60,14 +67,21 @@ def canonical_url(value: str) -> str:
     path = re.sub(r"/{2,}", "/", parts.path or "/")
     if path != "/":
         path = path.rstrip("/")
-    query = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
-             if not k.lower().startswith("utm_")]
+    query = [
+        (k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
+        if not k.lower().startswith("utm_")
+    ]
     return urlunsplit((scheme, host, path, urlencode(query), ""))
 
 
-def load_existing() -> tuple[set[str], set[str]]:
+def stable_id(name: str, canonical: str) -> str:
+    digest = hashlib.sha1(canonical.encode("utf-8")).hexdigest()[:8]
+    return f"mnp-{slugify(name)[:64]}-{digest}"
+
+
+def load_existing() -> tuple[set[str], dict[str, set[str]]]:
     urls: set[str] = set()
-    names: set[str] = set()
+    names: dict[str, set[str]] = {}
     for filename in ("quick_links.yml", "extra_links.yml"):
         path = DATA_DIR / filename
         if not path.exists():
@@ -76,10 +90,12 @@ def load_existing() -> tuple[set[str], set[str]]:
         for item in items:
             if not isinstance(item, dict):
                 continue
-            if item.get("url"):
-                urls.add(canonical_url(str(item["url"])))
-            if item.get("name"):
-                names.add(clean_space(str(item["name"])).casefold())
+            canon = canonical_url(str(item.get("url", "")))
+            if canon:
+                urls.add(canon)
+            name = clean_space(str(item.get("name", ""))).casefold()
+            if name:
+                names.setdefault(name, set()).add(canon)
     return urls, names
 
 
@@ -99,14 +115,17 @@ def parse_page(html: str) -> list[dict[str, str]]:
     soup = BeautifulSoup(html, "html.parser")
     lines = [clean_space(x) for x in soup.get_text("\n").splitlines()]
     lines = [x for x in lines if x]
-    title_indexes = [i for i, line in enumerate(lines)
-                     if re.match(r"^.+\s+Quick\s+Link$", line, re.I)]
+    title_indexes = [
+        i for i, line in enumerate(lines)
+        if re.match(r"^.+\s+Quick\s+Link$", line, re.I)
+    ]
     results: list[dict[str, str]] = []
 
     for pos, start in enumerate(title_indexes):
-        end = title_indexes[pos + 1] if pos + 1 < len(title_indexes) else min(len(lines), start + 40)
+        end = title_indexes[pos + 1] if pos + 1 < len(title_indexes) else min(len(lines), start + 45)
         block = lines[start:end]
-        raw_name = re.sub(r"\s+Quick\s+Link$", "", block[0], flags=re.I).strip()
+        raw_title = block[0]
+        raw_name = re.sub(r"\s+Quick\s+Link$", "", raw_title, flags=re.I).strip()
         if not raw_name or raw_name.lower() in {"quick", "type"}:
             continue
 
@@ -114,7 +133,11 @@ def parse_page(html: str) -> list[dict[str, str]]:
         description = ""
         categories = ""
         for idx, line in enumerate(block[1:], start=1):
-            if not url and (re.match(r"^https?://", line, re.I) or line.startswith("/web/") or line.startswith("/group/")):
+            if not url and (
+                re.match(r"^https?://", line, re.I)
+                or line.startswith("/web/")
+                or line.startswith("/group/")
+            ):
                 url = line
             if line.lower().startswith("description:"):
                 description = clean_space(line.split(":", 1)[1])
@@ -126,16 +149,12 @@ def parse_page(html: str) -> list[dict[str, str]]:
                     categories = block[idx + 1]
 
         if not url:
-            # Fall back to the result-title anchor when the displayed URL is omitted.
-            anchor = soup.find(string=re.compile(rf"^{re.escape(block[0])}$", re.I))
-            if anchor:
-                parent = anchor.parent
-                if parent and parent.name == "a" and parent.get("href"):
-                    url = parent.get("href", "")
-                elif parent:
-                    a = parent.find_parent("a")
-                    if a and a.get("href"):
-                        url = a.get("href", "")
+            text_node = soup.find(string=lambda s: bool(s and clean_space(str(s)) == raw_title))
+            if text_node:
+                parent = text_node.parent
+                anchor = parent if parent and parent.name == "a" else (parent.find_parent("a") if parent else None)
+                if anchor and anchor.get("href"):
+                    url = str(anchor.get("href"))
 
         if url:
             results.append({
@@ -167,7 +186,8 @@ def classify(name: str, url: str, mnp_categories: str) -> tuple[str, str, str]:
     elif any(word in hay for word in ("training", "education", "qualification", "school", "college", "university", "learning", "pqs", "dantes", "jst")):
         group, category = "Training & Education", "Training & Education"
     elif any(word in hay for word in ("pay", "benefit", "dfas", "travel", "dts", "pcs", "leave", "move", "gtcc")):
-        group, category = "Pay, Benefits & Travel", "Travel & PCS" if any(w in hay for w in ("travel", "dts", "pcs", "leave", "move", "gtcc")) else "Pay & Benefits"
+        group = "Pay, Benefits & Travel"
+        category = "Travel & PCS" if any(w in hay for w in ("travel", "dts", "pcs", "leave", "move", "gtcc")) else "Pay & Benefits"
     elif any(word in hay for word in ("advancement", "promotion", "selection board", "profile sheet", "frocking")):
         group, category = "Career & Personnel", "Advancement & Boards"
     elif any(word in hay for word in ("record", "ompf", "esr", "evaluation", "fitrep", "ndaws")):
@@ -189,7 +209,6 @@ def classify(name: str, url: str, mnp_categories: str) -> tuple[str, str, str]:
     if any(token in lower_url for token in ("/overview", "/resources/links", "/site-index", "/commands/")):
         kind = "hub"
     if "mn3p.navy.mil/web/" in lower_url or "mnp.navy.mil/group/" in lower_url:
-        # MNP content/overview pages are generally intermediary guidance pages.
         kind = "hub"
         group, category = "Portals & Directories", "Portals & Directories"
 
@@ -256,7 +275,6 @@ def main() -> int:
     if expected and len(records) < int(expected * 0.90):
         raise SystemExit(f"Refusing update: parsed {len(records)} of about {expected} MNP Quick Link records.")
 
-    # Merge duplicate MNP records that resolve to the same destination.
     merged: dict[str, dict[str, str]] = {}
     for record in records:
         canon = canonical_url(record["url"])
@@ -276,18 +294,25 @@ def main() -> int:
     already_covered = 0
 
     for canon, record in sorted(merged.items(), key=lambda kv: kv[1]["name"].casefold()):
-        if canon in existing_urls or record["name"].casefold() in existing_names:
+        if canon in existing_urls:
             already_covered += 1
             continue
-        group, category, kind = classify(record["name"], record["url"], record.get("mnp_categories", ""))
+
+        display_name = record["name"]
+        existing_for_name = existing_names.get(display_name.casefold(), set())
+        if existing_for_name and canon not in existing_for_name:
+            display_name = f"{display_name} (MNP)"
+
+        group, category, kind = classify(display_name, record["url"], record.get("mnp_categories", ""))
         generated.append({
-            "name": record["name"],
+            "id": stable_id(display_name, canon),
+            "name": display_name,
             "url": record["url"],
             "group": group,
             "category": category,
             "kind": kind,
-            "tags": build_tags(record["name"], record.get("mnp_categories", "")),
-            "description": record.get("description") or f"MyNavy Portal Quick Link: {record['name']}.",
+            "tags": build_tags(display_name, record.get("mnp_categories", "")),
+            "description": record.get("description") or f"MyNavy Portal Quick Link: {display_name}.",
             "cac": False,
             "source": "MyNavy Portal Quick Links",
             "mnp_categories": record.get("mnp_categories", ""),
@@ -309,7 +334,10 @@ def main() -> int:
         return 0
 
     tmp = OUTPUT.with_suffix(OUTPUT.suffix + ".tmp")
-    tmp.write_text(yaml.safe_dump(generated, sort_keys=False, allow_unicode=True, width=120), encoding="utf-8")
+    tmp.write_text(
+        yaml.safe_dump(generated, sort_keys=False, allow_unicode=True, width=120),
+        encoding="utf-8",
+    )
     tmp.replace(OUTPUT)
     META.write_text(yaml.safe_dump(summary, sort_keys=False, allow_unicode=True), encoding="utf-8")
     print(f"Wrote {OUTPUT} with {len(generated)} MNP-only destinations.", file=sys.stderr)
