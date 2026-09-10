@@ -10,7 +10,7 @@ from typing import Any
 
 import yaml
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "_data"
@@ -105,21 +105,7 @@ def rate_limited(client_key: str, link_id: str) -> bool:
     return False
 
 
-@app.get("/api/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
-
-
-@app.post("/api/click/{link_id}")
-def record_click(link_id: str, request: Request) -> JSONResponse:
-    catalog = load_catalog()
-    if link_id not in catalog:
-        raise HTTPException(status_code=404, detail="Unknown link")
-
-    client_key = transient_client_key(request)
-    if rate_limited(client_key, link_id):
-        return JSONResponse({"ok": True, "counted": False})
-
+def increment_click(link_id: str) -> None:
     now = int(time.time())
     with connect() as conn:
         conn.execute(
@@ -137,7 +123,43 @@ def record_click(link_id: str, request: Request) -> JSONResponse:
             (link_id, now),
         )
         conn.execute("DELETE FROM click_events WHERE clicked_at < ?", (now - 90 * 86400,))
+
+
+@app.get("/api/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
+@app.post("/api/click/{link_id}")
+def record_click(link_id: str, request: Request) -> JSONResponse:
+    catalog = load_catalog()
+    if link_id not in catalog:
+        raise HTTPException(status_code=404, detail="Unknown link")
+
+    client_key = transient_client_key(request)
+    if rate_limited(client_key, link_id):
+        return JSONResponse({"ok": True, "counted": False})
+
+    increment_click(link_id)
     return JSONResponse({"ok": True, "counted": True})
+
+
+@app.get("/api/go/{link_id}")
+def tracked_redirect(link_id: str, request: Request) -> RedirectResponse:
+    catalog = load_catalog()
+    item = catalog.get(link_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Unknown link")
+
+    destination = str(item.get("url", "")).strip()
+    if not destination.startswith(("https://", "http://")):
+        raise HTTPException(status_code=500, detail="Invalid destination")
+
+    client_key = transient_client_key(request)
+    if not rate_limited(client_key, link_id):
+        increment_click(link_id)
+
+    return RedirectResponse(destination, status_code=302)
 
 
 @app.get("/api/stats")
