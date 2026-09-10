@@ -99,9 +99,12 @@ title: Navylink
 
   <section id="link-grid" class="link-grid" aria-label="Navy and DoD links">
     {% assign all_links = site.data.quick_links | concat: site.data.extra_links %}
+    {% if site.data.mnp_quick_links_generated %}
+      {% assign all_links = all_links | concat: site.data.mnp_quick_links_generated %}
+    {% endif %}
     {% for link in all_links %}
-    {% assign sid = link.name | slugify %}
-    <article class="link-card" role="link" tabindex="0" aria-label="Open {{ link.name }}" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-group="{{ link.group | default: link.category | escape }}" data-category="{{ link.category | escape }}" data-kind="{{ link.kind | default: 'direct' }}" data-search="{{ link.name }} {{ link.group }} {{ link.category }} {{ link.tags }} {{ link.description }}">
+    {% if link.id %}{% assign sid = link.id %}{% else %}{% assign sid = link.name | slugify %}{% endif %}
+    <article class="link-card" role="link" tabindex="0" aria-label="Open {{ link.name }}" data-id="{{ sid }}" data-name="{{ link.name | escape }}" data-url="{{ link.url | escape }}" data-featured="{% if link.featured %}true{% else %}false{% endif %}" data-group="{{ link.group | default: link.category | escape }}" data-category="{{ link.category | escape }}" data-kind="{{ link.kind | default: 'direct' }}" data-search="{{ link.name }} {{ link.group }} {{ link.category }} {{ link.tags }} {{ link.mnp_categories }} {{ link.source }} {{ link.description }}">
       <div class="card-top">
         <div>
           <h3>{{ link.name }}</h3>
@@ -113,6 +116,7 @@ title: Navylink
         <span class="badge group">{{ link.group }}</span>
         <span class="badge">{{ link.category }}</span>
         {% if link.kind == 'hub' %}<span class="badge hub">Directory / Hub</span>{% endif %}
+        {% if link.source == 'MyNavy Portal Quick Links' %}<span class="badge">MNP Quick Link</span>{% endif %}
         {% if link.cac %}<span class="badge cac">🔒 CAC</span>{% endif %}
         {% if link.dodin %}<span class="badge dodin">DODIN</span>{% endif %}
       </div>
@@ -133,6 +137,6 @@ title: Navylink
     <div><a class="tracked-link" data-id="mynavy-quick-links" href="/api/go/mynavy-quick-links">Official MNP Quick Links</a><br><a class="tracked-link" data-id="mynavy-hr" href="/api/go/mynavy-hr">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
   </div>
 </footer>
-<script src="{{ '/assets/js/navylink.js' | relative_url }}?v=20260910-2" defer></script>
+<script src="{{ '/assets/js/navylink.js' | relative_url }}?v=20260910-3" defer></script>
 </body>
 </html>
