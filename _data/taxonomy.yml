@@ -1,0 +1,50 @@
+- name: Portals & Directories
+  description: Official landing pages, indexes, and resource directories that primarily lead to other destinations.
+  categories:
+    - Portals & Directories
+- name: Career & Personnel
+  description: Personnel records, assignments, advancement, detailing, evaluations, retirement, and career management.
+  categories:
+    - Records & Admin
+    - Career & Orders
+    - Advancement & Boards
+    - Retirement & Separation
+- name: Pay, Benefits & Travel
+  description: Pay, entitlements, insurance, benefits, official travel, PCS, and household goods.
+  categories:
+    - Pay & Benefits
+    - Travel & PCS
+- name: Training & Education
+  description: Navy training, education, credentials, transcripts, schools, and professional development.
+  categories:
+    - Training & Education
+    - Credentials & Education
+- name: Readiness & Health
+  description: Medical readiness, fitness, health care, resilience, prevention, and operational support.
+  categories:
+    - Health & Readiness
+    - Safety & Resilience
+- name: Family & Quality of Life
+  description: Family readiness, housing, childcare, recreation, ombudsman, and installation support.
+  categories:
+    - Family & Support
+    - Housing & Childcare
+- name: Policy & References
+  description: Regulations, instructions, manuals, messages, forms, publications, and official policy references.
+  categories:
+    - References
+    - Forms & Directives
+- name: Tools & IT
+  description: Enterprise tools, secure file exchange, directories, account access, and IT support.
+  categories:
+    - Tools
+    - IT & Enterprise Services
+- name: Reserve
+  description: Navy Reserve administration, policy, career management, and force resources.
+  categories:
+    - Reserve
+- name: Recruiting & Transition
+  description: Recruiting, commissioning, SkillBridge, transition assistance, veteran resources, and post-service planning.
+  categories:
+    - Recruiting
+    - Transition
