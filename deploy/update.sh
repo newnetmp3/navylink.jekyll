@@ -10,6 +10,9 @@ git reset --hard origin/main
 bundle install
 bundle exec jekyll build
 
+install -m 0755 "$APP_DIR/deploy/update.sh" /usr/local/sbin/navylink-update
+install -m 0755 "$APP_DIR/deploy/domain.sh" /usr/local/sbin/navylink-domain
+
 systemctl restart navylink
 caddy validate --config /etc/caddy/Caddyfile
 systemctl reload caddy
