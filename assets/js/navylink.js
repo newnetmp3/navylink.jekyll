@@ -1,4 +1,5 @@
 (() => {
+  const grid = document.querySelector('#link-grid');
   const cards = [...document.querySelectorAll('.link-card')];
   const search = document.querySelector('#link-search');
   const chips = [...document.querySelectorAll('.chip')];
@@ -6,18 +7,26 @@
   const empty = document.querySelector('#empty-state');
   const clearBtn = document.querySelector('#clear-filters');
   const favoritesBtn = document.querySelector('#favorites-only');
-  const storageKey = 'navylink-favorites-v1';
+  const sortSelect = document.querySelector('#sort-links');
+  const mostUsed = document.querySelector('#most-used-links');
+  const resetUsage = document.querySelector('#reset-usage');
+  const favoriteKey = 'navylink-favorites-v1';
+  const usageKey = 'navylink-usage-v1';
   let category = 'All';
   let favoritesOnly = false;
-  let favorites = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+  let favorites = new Set(JSON.parse(localStorage.getItem(favoriteKey) || '[]'));
+  let usage = JSON.parse(localStorage.getItem(usageKey) || '{}');
+
+  cards.forEach((card, index) => card.dataset.originalIndex = index);
 
   function normalize(v) { return (v || '').toLowerCase().trim(); }
-  function saveFavorites() { localStorage.setItem(storageKey, JSON.stringify([...favorites])); }
+  function saveFavorites() { localStorage.setItem(favoriteKey, JSON.stringify([...favorites])); }
+  function saveUsage() { localStorage.setItem(usageKey, JSON.stringify(usage)); }
+  function uses(id) { return Number(usage[id] || 0); }
 
   function renderStars() {
     document.querySelectorAll('.star').forEach(btn => {
-      const id = btn.dataset.id;
-      const saved = favorites.has(id);
+      const saved = favorites.has(btn.dataset.id);
       btn.classList.toggle('saved', saved);
       btn.setAttribute('aria-pressed', saved ? 'true' : 'false');
       btn.title = saved ? 'Remove from favorites' : 'Save as favorite';
@@ -25,7 +34,52 @@
     });
   }
 
+  function sortedCards() {
+    const mode = sortSelect.value;
+    return [...cards].sort((a, b) => {
+      if (mode === 'usage') return uses(b.dataset.id) - uses(a.dataset.id) || a.dataset.name.localeCompare(b.dataset.name);
+      if (mode === 'category') return a.dataset.category.localeCompare(b.dataset.category) || a.dataset.name.localeCompare(b.dataset.name);
+      if (mode === 'curated') return Number(a.dataset.originalIndex) - Number(b.dataset.originalIndex);
+      return a.dataset.name.localeCompare(b.dataset.name, undefined, { sensitivity: 'base' });
+    });
+  }
+
+  function renderOrder() {
+    sortedCards().forEach(card => grid.appendChild(card));
+  }
+
+  function renderMostUsed() {
+    const ranked = [...cards].sort((a, b) => {
+      const countDiff = uses(b.dataset.id) - uses(a.dataset.id);
+      if (countDiff) return countDiff;
+      const featuredDiff = (b.dataset.featured === 'true') - (a.dataset.featured === 'true');
+      if (featuredDiff) return featuredDiff;
+      return a.dataset.name.localeCompare(b.dataset.name);
+    }).slice(0, 6);
+
+    mostUsed.innerHTML = '';
+    ranked.forEach(card => {
+      const a = document.createElement('a');
+      a.href = card.dataset.url;
+      a.dataset.id = card.dataset.id;
+      a.className = 'most-used-link';
+      const n = uses(card.dataset.id);
+      a.innerHTML = `<span>${card.dataset.name}</span><small>${n ? `${n} open${n === 1 ? '' : 's'}` : 'Starter shortcut'}</small>`;
+      a.addEventListener('click', () => recordUse(card.dataset.id));
+      mostUsed.appendChild(a);
+    });
+  }
+
+  function recordUse(id) {
+    if (!id) return;
+    usage[id] = uses(id) + 1;
+    saveUsage();
+    renderMostUsed();
+    if (sortSelect.value === 'usage') renderOrder();
+  }
+
   function filter() {
+    renderOrder();
     const q = normalize(search.value);
     let visible = 0;
     cards.forEach(card => {
@@ -36,11 +90,13 @@
       card.classList.toggle('hidden', !show);
       if (show) visible++;
     });
-    count.textContent = `${visible} link${visible === 1 ? '' : 's'}`;
+    count.textContent = `${visible} link${visible === 1 ? '' : 's'} · ${sortSelect.options[sortSelect.selectedIndex].text}`;
     empty.classList.toggle('show', visible === 0);
   }
 
   search.addEventListener('input', filter);
+  sortSelect.addEventListener('change', filter);
+
   chips.forEach(chip => chip.addEventListener('click', () => {
     category = chip.dataset.category;
     chips.forEach(c => c.classList.toggle('active', c === chip));
@@ -55,6 +111,8 @@
     filter();
   }));
 
+  document.querySelectorAll('.tracked-link').forEach(link => link.addEventListener('click', () => recordUse(link.dataset.id)));
+
   favoritesBtn.addEventListener('click', () => {
     favoritesOnly = !favoritesOnly;
     favoritesBtn.setAttribute('aria-pressed', favoritesOnly ? 'true' : 'false');
@@ -66,6 +124,7 @@
     category = 'All';
     favoritesOnly = false;
     search.value = '';
+    sortSelect.value = 'alpha';
     chips.forEach(c => c.classList.toggle('active', c.dataset.category === 'All'));
     favoritesBtn.setAttribute('aria-pressed', 'false');
     favoritesBtn.textContent = '☆ Favorites';
@@ -73,8 +132,15 @@
     search.focus();
   });
 
+  resetUsage.addEventListener('click', () => {
+    usage = {};
+    saveUsage();
+    renderMostUsed();
+    if (sortSelect.value === 'usage') filter();
+  });
+
   document.addEventListener('keydown', e => {
-    if (e.key === '/' && document.activeElement !== search && !/input|textarea/i.test(document.activeElement.tagName)) {
+    if (e.key === '/' && document.activeElement !== search && !/input|textarea|select/i.test(document.activeElement.tagName)) {
       e.preventDefault();
       search.focus();
     }
@@ -86,5 +152,6 @@
   });
 
   renderStars();
+  renderMostUsed();
   filter();
 })();
