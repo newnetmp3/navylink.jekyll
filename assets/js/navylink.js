@@ -9,19 +9,17 @@
   const favoritesBtn = document.querySelector('#favorites-only');
   const sortSelect = document.querySelector('#sort-links');
   const mostUsed = document.querySelector('#most-used-links');
-  const resetUsage = document.querySelector('#reset-usage');
+  const refreshUsage = document.querySelector('#refresh-usage');
   const favoriteKey = 'navylink-favorites-v1';
-  const usageKey = 'navylink-usage-v1';
   let category = 'All';
   let favoritesOnly = false;
   let favorites = new Set(JSON.parse(localStorage.getItem(favoriteKey) || '[]'));
-  let usage = JSON.parse(localStorage.getItem(usageKey) || '{}');
+  let usage = {};
 
   cards.forEach((card, index) => card.dataset.originalIndex = index);
 
   function normalize(v) { return (v || '').toLowerCase().trim(); }
   function saveFavorites() { localStorage.setItem(favoriteKey, JSON.stringify([...favorites])); }
-  function saveUsage() { localStorage.setItem(usageKey, JSON.stringify(usage)); }
   function uses(id) { return Number(usage[id] || 0); }
 
   function renderStars() {
@@ -64,18 +62,46 @@
       a.dataset.id = card.dataset.id;
       a.className = 'most-used-link';
       const n = uses(card.dataset.id);
-      a.innerHTML = `<span>${card.dataset.name}</span><small>${n ? `${n} open${n === 1 ? '' : 's'}` : 'Starter shortcut'}</small>`;
+      a.innerHTML = `<span>${card.dataset.name}</span><small>${n ? `${n.toLocaleString()} open${n === 1 ? '' : 's'}` : 'Starter shortcut'}</small>`;
       a.addEventListener('click', () => recordUse(card.dataset.id));
       mostUsed.appendChild(a);
     });
   }
 
+  async function loadUsage() {
+    if (refreshUsage) {
+      refreshUsage.disabled = true;
+      refreshUsage.textContent = 'Refreshing…';
+    }
+    try {
+      const response = await fetch('/api/stats', { cache: 'no-store' });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      usage = {};
+      for (const item of (data.links || [])) usage[item.id] = Number(item.total || 0);
+      renderMostUsed();
+      if (sortSelect.value === 'usage') filter();
+    } catch (err) {
+      console.warn('[Navylink] Global usage API unavailable; using starter ranking.', err);
+      renderMostUsed();
+    } finally {
+      if (refreshUsage) {
+        refreshUsage.disabled = false;
+        refreshUsage.textContent = 'Refresh rankings';
+      }
+    }
+  }
+
   function recordUse(id) {
     if (!id) return;
     usage[id] = uses(id) + 1;
-    saveUsage();
     renderMostUsed();
     if (sortSelect.value === 'usage') renderOrder();
+    fetch(`/api/click/${encodeURIComponent(id)}`, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Accept': 'application/json' }
+    }).catch(err => console.warn('[Navylink] Click count was not recorded.', err));
   }
 
   function filter() {
@@ -132,12 +158,7 @@
     search.focus();
   });
 
-  resetUsage.addEventListener('click', () => {
-    usage = {};
-    saveUsage();
-    renderMostUsed();
-    if (sortSelect.value === 'usage') filter();
-  });
+  if (refreshUsage) refreshUsage.addEventListener('click', loadUsage);
 
   document.addEventListener('keydown', e => {
     if (e.key === '/' && document.activeElement !== search && !/input|textarea|select/i.test(document.activeElement.tagName)) {
@@ -154,4 +175,5 @@
   renderStars();
   renderMostUsed();
   filter();
+  loadUsage();
 })();
