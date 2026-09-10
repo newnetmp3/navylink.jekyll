@@ -45,6 +45,7 @@ bundle exec jekyll build
 
 install -m 0644 "$APP_DIR/deploy/navylink.service" /etc/systemd/system/navylink.service
 install -m 0644 "$APP_DIR/deploy/Caddyfile.ip" /etc/caddy/Caddyfile
+install -m 0755 "$APP_DIR/deploy/update.sh" /usr/local/sbin/navylink-update
 
 systemctl daemon-reload
 systemctl enable --now navylink.service
@@ -56,22 +57,6 @@ ufw allow OpenSSH
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw --force enable
-
-cat >/usr/local/sbin/navylink-update <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-cd /opt/navylink
-git fetch --all --prune
-git reset --hard origin/main
-./.venv/bin/pip install -r server/requirements.txt
-bundle install
-bundle exec jekyll build
-systemctl restart navylink
-caddy validate --config /etc/caddy/Caddyfile
-systemctl reload caddy
-curl -fsS http://127.0.0.1:8000/api/health && echo
-EOF
-chmod 0755 /usr/local/sbin/navylink-update
 
 cat >/usr/local/sbin/navylink-domain <<'EOF'
 #!/usr/bin/env bash
