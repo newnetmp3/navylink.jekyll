@@ -1,0 +1,110 @@
+---
+layout: null
+title: Navylink
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071a2f">
+  <meta name="description" content="A fast, organized launchpad for U.S. Navy and DoD web resources.">
+  <title>Navylink — Navy Quick Links, Organized</title>
+  <link rel="stylesheet" href="{{ '/assets/css/navylink.css' | relative_url }}">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to links</a>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="official"><span class="flagdot" aria-hidden="true"></span><span>Independent convenience directory · not an official U.S. Navy website</span></div>
+    <span>Verify sensitive destinations before signing in.</span>
+  </div>
+</div>
+<header class="hero">
+  <div class="shell">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">N</div>
+      <div><strong>Navylink</strong><small>Get to the right system faster.</small></div>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Sailor web launchpad</div>
+        <h1>Less hunting.<br>More getting things done.</h1>
+        <p class="hero-copy">Navy and DoD links organized around the tasks Sailors actually do: records, orders, pay, training, readiness, travel, family support and transition.</p>
+        <div class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <label class="hidden" for="link-search">Search Navy links</label>
+          <input id="link-search" class="search" type="search" autocomplete="off" placeholder="Search by system, task, acronym, or topic…">
+          <span class="kbd" aria-hidden="true">/</span>
+        </div>
+      </div>
+      <aside class="hero-note">
+        <strong>CAC & network-aware</strong>
+        <p>Links that commonly require CAC are clearly marked. DODIN-only resources are called out separately so you know before you click.</p>
+      </aside>
+    </div>
+  </div>
+</header>
+<main id="main" class="main shell">
+  <nav class="quickbar" aria-label="Most used Navy links">
+    <a href="https://www.nsips.cloud.navy.mil/my.policy"><span>NSIPS</span><small>ESR · Leave</small></a>
+    <a href="https://www.bol.navy.mil/bam/"><span>BOL</span><small>OMPF · PSR</small></a>
+    <a href="https://mynavyassignment.dc3n.navy.mil/"><span>MNA</span><small>Orders · Billets</small></a>
+    <a href="https://mypay.dfas.mil/#/"><span>myPay</span><small>LES · Taxes</small></a>
+    <a href="https://learning.nel.navy.mil/ELIAASv2p/"><span>Navy eLearning</span><small>Training · GMT</small></a>
+    <a href="https://dtsproweb.defensetravel.osd.mil/dts-app/pubsite/all/first"><span>DTS</span><small>TDY · Vouchers</small></a>
+  </nav>
+
+  <div class="section-head">
+    <div><h2>Find what you need</h2><p>Filter by mission area or type exactly what you are trying to accomplish.</p></div>
+  </div>
+
+  <div class="category-strip" role="group" aria-label="Filter links by category">
+    {% assign categories = "All,Popular,Records & Admin,Career & Orders,Pay & Benefits,Training & Education,Health & Readiness,Travel & PCS,Family & Support,References,Tools,Help & Support,Reserve,Transition" | split: "," %}
+    {% for cat in categories %}<button class="chip{% if cat == 'All' %} active{% endif %}" type="button" data-category="{{ cat }}">{{ cat }}</button>{% endfor %}
+  </div>
+
+  <div class="toolbar">
+    <div id="result-count" class="result-count" aria-live="polite"></div>
+    <div class="toolbar-actions">
+      <button id="favorites-only" class="toolbtn" type="button" aria-pressed="false">☆ Favorites</button>
+      <button id="clear-filters" class="toolbtn" type="button">Reset</button>
+    </div>
+  </div>
+
+  <section class="link-grid" aria-label="Navy and DoD links">
+    {% for link in site.data.quick_links %}
+    {% assign sid = link.name | slugify %}
+    <article class="link-card" data-id="{{ sid }}" data-category="{{ link.category }}" data-search="{{ link.name }} {{ link.category }} {{ link.tags }} {{ link.description }}">
+      <div class="card-top">
+        <div>
+          <h3>{{ link.name }}</h3>
+          <p>{{ link.description }}</p>
+        </div>
+        <button class="star" type="button" data-id="{{ sid }}" aria-label="Save {{ link.name }} as favorite" aria-pressed="false">☆</button>
+      </div>
+      <div class="badges">
+        <span class="badge">{{ link.category }}</span>
+        {% if link.cac %}<span class="badge cac">🔒 CAC</span>{% endif %}
+        {% if link.dodin %}<span class="badge dodin">DODIN</span>{% endif %}
+      </div>
+      <div class="card-actions"><a class="launch" href="{{ link.url }}">Open site →</a></div>
+    </article>
+    {% endfor %}
+  </section>
+  <div id="empty-state" class="empty"><strong>No matching links.</strong><br>Try a broader term or reset the filters.</div>
+
+  <section class="info-grid" aria-label="Navylink notes">
+    <div class="info-card warning"><h3>Before entering credentials</h3><p>Navylink is a convenience directory, not an authentication provider. Confirm the destination domain and certificate before entering credentials, personal information, or using your CAC.</p></div>
+    <div class="info-card"><h3>Official source of record</h3><p>MyNavy Portal now maintains a searchable Quick Links database with hundreds of resources. Use the official MNP directory when you need the authoritative current listing.</p></div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="shell footer-grid">
+    <div><strong>Navylink</strong><p>A streamlined directory for commonly used Navy and DoD services. Built for speed on desktop, tablet and mobile.</p><div class="legal">Links reviewed September 2026. External systems may change without notice.</div></div>
+    <div><a href="https://www.mn3p.navy.mil/quick-links">Official MNP Quick Links</a><br><a href="https://www.mynavyhr.navy.mil/">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
+  </div>
+</footer>
+<script src="{{ '/assets/js/navylink.js' | relative_url }}" defer></script>
+</body>
+</html>
