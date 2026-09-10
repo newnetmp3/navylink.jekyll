@@ -90,7 +90,7 @@ title: Navylink
         {% if link.cac %}<span class="badge cac">🔒 CAC</span>{% endif %}
         {% if link.dodin %}<span class="badge dodin">DODIN</span>{% endif %}
       </div>
-      <div class="card-actions"><a class="launch tracked-link" data-id="{{ sid }}" href="{{ link.url }}">Open site →</a></div>
+      <div class="card-actions"><a class="launch tracked-link" data-id="{{ sid }}" href="/api/go/{{ sid }}">Open site →</a></div>
     </article>
     {% endfor %}
   </section>
@@ -104,9 +104,9 @@ title: Navylink
 <footer class="footer">
   <div class="shell footer-grid">
     <div><strong>Navylink</strong><p>A streamlined directory for commonly used Navy and DoD services. Built for speed on desktop, tablet and mobile.</p><div class="legal">Links reviewed September 2026. External systems may change without notice. Aggregate usage counts do not store persistent visitor identities.</div></div>
-    <div><a class="tracked-link" data-id="mynavy-quick-links" href="https://www.mn3p.navy.mil/quick-links">Official MNP Quick Links</a><br><a class="tracked-link" data-id="mynavy-hr" href="https://www.mynavyhr.navy.mil/">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
+    <div><a class="tracked-link" data-id="mynavy-quick-links" href="/api/go/mynavy-quick-links">Official MNP Quick Links</a><br><a class="tracked-link" data-id="mynavy-hr" href="/api/go/mynavy-hr">MyNavy HR</a><br><a href="https://www.navy.mil/">Navy.mil</a></div>
   </div>
 </footer>
-<script src="{{ '/assets/js/navylink.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/navylink.js' | relative_url }}?v=20260910-1" defer></script>
 </body>
 </html>
