@@ -113,6 +113,12 @@
     transmitUse(id);
   }
 
+  function openCard(card) {
+    if (!card?.dataset.url || !card.dataset.id) return;
+    recordUse(card.dataset.id);
+    window.location.href = card.dataset.url;
+  }
+
   function filter() {
     renderOrder();
     const q = normalize(search.value);
@@ -138,7 +144,8 @@
     filter();
   }));
 
-  document.querySelectorAll('.star').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.star').forEach(btn => btn.addEventListener('click', event => {
+    event.stopPropagation();
     const id = btn.dataset.id;
     favorites.has(id) ? favorites.delete(id) : favorites.add(id);
     saveFavorites();
@@ -146,7 +153,24 @@
     filter();
   }));
 
-  document.querySelectorAll('.tracked-link').forEach(link => link.addEventListener('click', () => recordUse(link.dataset.id)));
+  document.querySelectorAll('.tracked-link').forEach(link => link.addEventListener('click', event => {
+    event.stopPropagation();
+    recordUse(link.dataset.id);
+  }));
+
+  cards.forEach(card => {
+    card.addEventListener('click', event => {
+      if (event.target.closest('a,button,input,select,textarea,label')) return;
+      openCard(card);
+    });
+    card.addEventListener('keydown', event => {
+      if (event.target !== card) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openCard(card);
+      }
+    });
+  });
 
   favoritesBtn.addEventListener('click', () => {
     favoritesOnly = !favoritesOnly;
