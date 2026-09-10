@@ -1,12 +1,16 @@
 title: Navylink
-
-# Set a path/url to a logo that will be displayed instead of the title
-# logo: "https://navylink.net/assets/site_images/nlink_logo_clr.png"
-
-description: All the links for the chain
+description: A fast, organized launchpad for U.S. Navy and DoD web resources.
 theme: just-the-docs
-
 url: https://www.navylink.net
 
+color_scheme: nil
+search_enabled: false
+heading_anchors: false
+
 aux_links:
-  Template Repository: https://github.com/just-the-docs/just-the-docs-template
+  GitHub:
+    - https://github.com/newnetmp3/navylink.jekyll
+
+exclude:
+  - README.md
+  - index.md.old
