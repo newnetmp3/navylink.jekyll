@@ -92,16 +92,25 @@
     }
   }
 
+  function transmitUse(id) {
+    const url = `/api/click/${encodeURIComponent(id)}`;
+    if (typeof navigator.sendBeacon === 'function') {
+      const sent = navigator.sendBeacon(url, '');
+      if (sent) return;
+    }
+    fetch(url, {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Accept': 'application/json' }
+    }).catch(err => console.warn('[Navylink] Click count was not recorded.', err));
+  }
+
   function recordUse(id) {
     if (!id) return;
     usage[id] = uses(id) + 1;
     renderMostUsed();
     if (sortSelect.value === 'usage') renderOrder();
-    fetch(`/api/click/${encodeURIComponent(id)}`, {
-      method: 'POST',
-      keepalive: true,
-      headers: { 'Accept': 'application/json' }
-    }).catch(err => console.warn('[Navylink] Click count was not recorded.', err));
+    transmitUse(id);
   }
 
   function filter() {
