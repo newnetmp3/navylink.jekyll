@@ -7,6 +7,29 @@ cd "$APP_DIR"
 git fetch --all --prune
 git reset --hard origin/main
 ./.venv/bin/pip install -r server/requirements.txt
+
+PREV_MNP=""
+PREV_META=""
+if [[ -f _data/mnp_quick_links.generated.yml ]]; then
+  PREV_MNP="$(mktemp)"
+  cp _data/mnp_quick_links.generated.yml "$PREV_MNP"
+fi
+if [[ -f _data/mnp_quick_links.meta.yml ]]; then
+  PREV_META="$(mktemp)"
+  cp _data/mnp_quick_links.meta.yml "$PREV_META"
+fi
+
+echo "Syncing MyNavy Portal Quick Links..."
+if ./.venv/bin/python tools/sync_mnp_quicklinks.py; then
+  echo "MyNavy Portal Quick Links sync complete."
+else
+  echo "WARNING: MyNavy Portal sync failed; preserving the last known-good generated catalog." >&2
+  if [[ -n "$PREV_MNP" && -f "$PREV_MNP" ]]; then cp "$PREV_MNP" _data/mnp_quick_links.generated.yml; fi
+  if [[ -n "$PREV_META" && -f "$PREV_META" ]]; then cp "$PREV_META" _data/mnp_quick_links.meta.yml; fi
+fi
+[[ -z "$PREV_MNP" ]] || rm -f "$PREV_MNP"
+[[ -z "$PREV_META" ]] || rm -f "$PREV_META"
+
 bundle install
 bundle exec jekyll build
 
