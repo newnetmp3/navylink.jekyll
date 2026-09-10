@@ -1,90 +1,440 @@
 - name: Joint Knowledge Online (JKO)
   url: https://www.jcs.mil/JKO/
+  group: Training & Education
   category: Training & Education
-  tags: jko joint knowledge online training courses
+  kind: direct
+  tags: jko joint knowledge online training courses joint learning
   description: Joint Knowledge Online training and distributed learning resources.
   cac: false
 - name: Thrift Savings Plan (TSP)
   url: https://www.tsp.gov/
+  group: Pay, Benefits & Travel
   category: Pay & Benefits
+  kind: direct
   tags: tsp retirement savings matching investment blended retirement
   description: Federal retirement savings account management and TSP information.
   cac: false
 - name: United Services Military Apprenticeship Program (USMAP)
   url: https://usmap.osd.mil/
-  category: Training & Education
-  tags: usmap apprenticeship journeyman trade credentials hours
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: usmap apprenticeship journeyman trade credentials hours dol
   description: Document military work experience toward Department of Labor apprenticeship credentials.
   cac: false
 - name: Navy Digital Library
   url: https://mwrdigitallibrary.navy.mil/
-  category: Training & Education
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
   tags: library ebooks audiobooks research test preparation mwr
   description: Navy MWR digital books, audiobooks, research databases and learning resources.
   cac: false
 - name: Navy Awards / NDAWS Information
   url: https://www.mynavyhr.navy.mil/Career-Management/Records-Management/Decorations-and-Medals/
+  group: Career & Personnel
   category: Records & Admin
+  kind: direct
   tags: ndaws awards decorations medals ompf citations ribbons
   description: Official Navy awards guidance and NDAWS information. NDAWS itself is accessed through BOL.
   cac: false
 - name: Navy Advancement Center
-  url: https://www.netc.navy.mil/Commands/Naval-Education-and-Training-Professional-Development-Center/Navy-Advancement-Center/
-  category: Career & Orders
-  tags: advancement exam profile sheet quotas bibliographies nac
-  description: Navy enlisted advancement exam, cycle, quota and advancement resources.
+  url: https://www.netc.navy.mil/Commands/Naval-Education-and-Training-Professional-Development-Center/Navy-Advancement-Center-N3/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: direct
+  tags: advancement exam profile sheet quotas bibliographies nac enlisted
+  description: Navy enlisted advancement exam, quota, eligibility and advancement resources.
   cac: false
 - name: milSuite
   url: https://www.milsuite.mil/
+  group: Tools & IT
   category: Tools
-  tags: milsuite milbook milwiki collaboration dod communities
+  kind: direct
+  tags: milsuite milbook milwiki collaboration dod communities knowledge
   description: DoD professional collaboration communities, knowledge sharing and resources.
   cac: true
 - name: Navy MWR
   url: https://www.navymwr.org/
+  group: Family & Quality of Life
   category: Family & Support
+  kind: hub
   tags: mwr recreation fitness liberty tickets lodging quality of life
   description: Navy Morale, Welfare and Recreation programs and installation services.
   cac: false
 - name: Navy Exchange (NEX)
   url: https://www.mynavyexchange.com/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: nex exchange shopping uniforms services
+  kind: direct
+  tags: nex exchange shopping uniforms services commissary retail
   description: Navy Exchange shopping, uniform and installation service information.
   cac: false
 - name: Navy Housing
   url: https://ffr.cnic.navy.mil/Navy-Housing/
-  category: Travel & PCS
-  tags: housing pcs barracks family housing rental community
+  group: Family & Quality of Life
+  category: Housing & Childcare
+  kind: direct
+  tags: housing pcs barracks family housing rental community hsc
   description: Navy housing resources for military family housing, barracks and community rentals.
   cac: false
 - name: Navy Child & Youth Programs
   url: https://www.navycyp.org/
-  category: Family & Support
-  tags: child care youth cdc school age family
+  group: Family & Quality of Life
+  category: Housing & Childcare
+  kind: direct
+  tags: child care youth cdc school age family childcare enrollment
   description: Navy child care, youth programs and enrollment resources.
   cac: false
 - name: CNIC
   url: https://www.cnic.navy.mil/
-  category: References
-  tags: cnic installations shore command base services
-  description: Commander, Navy Installations Command information and installation resources.
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: cnic installations shore command base services directory
+  description: Commander, Navy Installations Command portal and installation-resource directory.
   cac: false
 - name: Joint Travel Regulations (JTR)
   url: https://www.travel.dod.mil/Policy-Regulations/Joint-Travel-Regulations/
+  group: Pay, Benefits & Travel
   category: Travel & PCS
-  tags: jtr travel entitlement per diem pcs tdy regulation
+  kind: direct
+  tags: jtr travel entitlement per diem pcs tdy regulation allowances
   description: Current DoD Joint Travel Regulations and travel entitlement policy.
   cac: false
 - name: Defense Personal Property System (DPS)
   url: https://dps.move.mil/cust/standard/user/home.xhtml
+  group: Pay, Benefits & Travel
   category: Travel & PCS
-  tags: dps household goods pcs move shipment hhg
+  kind: direct
+  tags: dps household goods pcs move shipment hhg personal property
   description: Manage PCS household-goods shipments and personal property moves.
   cac: true
 - name: Federal Voting Assistance Program
   url: https://www.fvap.gov/
+  group: Family & Quality of Life
   category: Family & Support
-  tags: voting absentee ballot election military overseas
+  kind: direct
+  tags: voting absentee ballot election military overseas fvap
   description: Voting assistance for service members, families and overseas citizens.
+  cac: false
+- name: MyNavy HR Site Index
+  url: https://www.mynavyhr.navy.mil/site-index/
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: mynavy hr site map directory npc personnel index
+  description: Complete official MyNavy HR site directory across career, support and reference topics.
+  cac: false
+- name: Navy Personnel Command Site Directory
+  url: https://www.mynavyhr.navy.mil/References/Site-Directories/NPC/
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: npc pers directory personnel command offices contacts
+  description: Official directory of Navy Personnel Command PERS organizations and functions.
+  cac: false
+- name: NETC Resource Links
+  url: https://www.netc.navy.mil/Resources/Links/
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: netc training resources links cetars cantrac fltmps directory
+  description: NETC directory of official Navy training and education systems.
+  cac: false
+- name: MyNavy HR Detailing
+  url: https://www.mynavyhr.navy.mil/Career-Management/Detailing/
+  group: Career & Personnel
+  category: Career & Orders
+  kind: hub
+  tags: detailing detailer orders enlisted officer pers4 assignment
+  description: Official PERS-4 detailing information for officer and enlisted assignments.
+  cac: false
+- name: MyNavy HR Selection Boards
+  url: https://www.mynavyhr.navy.mil/Career-Management/Boards/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: hub
+  tags: selection boards enlisted officer reserve promotion advancement
+  description: Official Navy selection-board schedules, guidance, precepts and results.
+  cac: false
+- name: CPO Selection Boards
+  url: https://www.mynavyhr.navy.mil/Career-Management/Boards/Active-Duty-Enlisted/CPO-Selection-Boards/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: direct
+  tags: chief cpo e7 selection board quotas precept results
+  description: Active-duty Chief Petty Officer selection-board information and results.
+  cac: false
+- name: SCPO Selection Boards
+  url: https://www.mynavyhr.navy.mil/Career-Management/Boards/Active-Duty-Enlisted/SCPO-Selection-Boards/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: direct
+  tags: senior chief scpo e8 selection board quotas precept results
+  description: Active-duty Senior Chief Petty Officer selection-board information and results.
+  cac: false
+- name: MCPO Selection Boards
+  url: https://www.mynavyhr.navy.mil/Career-Management/Boards/Active-Duty-Enlisted/MCPO-Selection-Boards/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: direct
+  tags: master chief mcpo e9 selection board quotas precept results
+  description: Active-duty Master Chief Petty Officer selection-board information and results.
+  cac: false
+- name: CMDCM Selection Boards
+  url: https://www.mynavyhr.navy.mil/Career-Management/Boards/Active-Duty-Enlisted/CMDCM-Selection-Boards/
+  group: Career & Personnel
+  category: Advancement & Boards
+  kind: direct
+  tags: command master chief cmdcm selection board csel
+  description: Command Master Chief selection-board information and results.
+  cac: false
+- name: Physical Readiness Program
+  url: https://www.mynavyhr.navy.mil/Support-Services/Culture-Resilience/Physical-Readiness/
+  group: Readiness & Health
+  category: Health & Readiness
+  kind: direct
+  tags: pfa prt bca physical readiness fitness cfl acfl
+  description: Official Navy Physical Readiness Program policy, guidance and resources.
+  cac: false
+- name: Exceptional Family Member Program (EFMP)
+  url: https://www.mynavyhr.navy.mil/Support-Services/Exceptional-Family-Member/
+  group: Family & Quality of Life
+  category: Family & Support
+  kind: direct
+  tags: efmp exceptional family member special needs assignment support
+  description: Official Navy Exceptional Family Member Program information and enrollment resources.
+  cac: false
+- name: Casualty Assistance
+  url: https://www.mynavyhr.navy.mil/Support-Services/Casualty/
+  group: Family & Quality of Life
+  category: Family & Support
+  kind: direct
+  tags: casualty assistance caco survivor death benefits next of kin
+  description: Navy casualty assistance, survivor support and CACO resources.
+  cac: false
+- name: Culture & Resilience
+  url: https://www.mynavyhr.navy.mil/Support-Services/Culture-Resilience/
+  group: Readiness & Health
+  category: Safety & Resilience
+  kind: hub
+  tags: culture resilience prevention equal opportunity sapr suicide alcohol drug
+  description: MyNavy HR hub for resilience, prevention, equal opportunity and readiness programs.
+  cac: false
+- name: Navy Sexual Assault Prevention and Response
+  url: https://www.mynavyhr.navy.mil/Support-Services/Culture-Resilience/Sexual-Assault/
+  group: Readiness & Health
+  category: Safety & Resilience
+  kind: direct
+  tags: sapr sexual assault prevention response victim advocate safe helpline
+  description: Official Navy SAPR policy, reporting and support resources.
+  cac: false
+- name: DoD Safe Helpline
+  url: https://www.safehelpline.org/
+  group: Readiness & Health
+  category: Safety & Resilience
+  kind: direct
+  tags: sapr safe helpline sexual assault confidential support dod
+  description: DoD Safe Helpline support and reporting resources for sexual assault survivors.
+  cac: false
+- name: Navy Medicine
+  url: https://www.med.navy.mil/
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: navy medicine bumed medical health hospitals clinics directory
+  description: Bureau of Medicine and Surgery portal for Navy Medicine commands and resources.
+  cac: false
+- name: MHS GENESIS Patient Portal
+  url: https://my.mhsgenesis.health.mil/
+  group: Readiness & Health
+  category: Health & Readiness
+  kind: direct
+  tags: mhs genesis patient portal appointments records prescriptions messages
+  description: DoD electronic health record patient portal for appointments, records and secure messaging.
+  cac: false
+- name: MyNavy HR Retirement
+  url: https://www.mynavyhr.navy.mil/Career-Management/Retirement/
+  group: Career & Personnel
+  category: Retirement & Separation
+  kind: hub
+  tags: retirement fleet reserve officer enlisted separation timeline
+  description: Navy retirement and Fleet Reserve policy, timelines and application guidance.
+  cac: false
+- name: Enlisted Retirements
+  url: https://www.mynavyhr.navy.mil/Career-Management/Retirement/Enlisted-Retirements/
+  group: Career & Personnel
+  category: Retirement & Separation
+  kind: direct
+  tags: enlisted retirement fleet reserve transfer 20 years retirement request
+  description: Enlisted retirement and Fleet Reserve procedures and policy.
+  cac: false
+- name: MyNavy HR Transition
+  url: https://www.mynavyhr.navy.mil/Career-Management/Transition/
+  group: Recruiting & Transition
+  category: Transition
+  kind: hub
+  tags: transition separation tap skillbridge retirement civilian career
+  description: MyNavy HR transition resources for separating and retiring Sailors.
+  cac: false
+- name: MyNavy HR Records Management
+  url: https://www.mynavyhr.navy.mil/Career-Management/Records-Management/
+  group: Career & Personnel
+  category: Records & Admin
+  kind: hub
+  tags: records ompf corrections document submission awards personnel record
+  description: Official personnel records management and document-submission guidance.
+  cac: false
+- name: Performance Evaluation
+  url: https://www.mynavyhr.navy.mil/Career-Management/Performance-Evaluation/
+  group: Career & Personnel
+  category: Records & Admin
+  kind: direct
+  tags: eval fitrep performance evaluation e1 e9 officer reporting senior
+  description: Official FITREP and evaluation policy, forms, guidance and references.
+  cac: false
+- name: Career Counseling
+  url: https://www.mynavyhr.navy.mil/Career-Management/Career-Counseling/
+  group: Career & Personnel
+  category: Career & Orders
+  kind: direct
+  tags: career counselor ccc cway reenlistment retention career development
+  description: Navy career counseling, retention and career-development resources.
+  cac: false
+- name: BUPERS Instructions
+  url: https://www.mynavyhr.navy.mil/References/BUPERS-Instructions/
+  group: Policy & References
+  category: Forms & Directives
+  kind: direct
+  tags: bupers instructions policy personnel directives
+  description: Current Bureau of Naval Personnel instructions and changes.
+  cac: false
+- name: NEOCS Manual
+  url: https://www.mynavyhr.navy.mil/References/NEOCS-Manual/
+  group: Policy & References
+  category: References
+  kind: direct
+  tags: neocs enlisted occupational classification rating nec manual
+  description: Navy Enlisted Occupational Classification System manual and references.
+  cac: false
+- name: NOOCS Manual
+  url: https://www.mynavyhr.navy.mil/References/NOOCS-Manual/
+  group: Policy & References
+  category: References
+  kind: direct
+  tags: noocs officer occupational classification designator subspecialty manual
+  description: Navy Officer Occupational Classification System manual and references.
+  cac: false
+- name: Navy Reserve Personnel Manual (RESPERSMAN)
+  url: https://www.navyreserve.navy.mil/Resources/Official-RESFOR-Guidance/RESPERSMAN/
+  group: Reserve
+  category: Reserve
+  kind: direct
+  tags: respersman reserve personnel manual policy drilling selres
+  description: Official Navy Reserve Personnel Manual and Reserve personnel policy.
+  cac: false
+- name: Navy Recruiting Command
+  url: https://www.cnrc.navy.mil/
+  group: Recruiting & Transition
+  category: Recruiting
+  kind: hub
+  tags: recruiting cnrc recruiter accession enlisted officer recruiting command
+  description: Navy Recruiting Command information and official recruiting resources.
+  cac: false
+- name: Navy Recruiting
+  url: https://www.navy.com/
+  group: Recruiting & Transition
+  category: Recruiting
+  kind: direct
+  tags: navy recruiting careers enlist officer reserve jobs recruiter
+  description: Official Navy recruiting site for enlisted, officer and Reserve opportunities.
+  cac: false
+- name: Naval Service Training Command
+  url: https://www.netc.navy.mil/NSTC/
+  group: Training & Education
+  category: Training & Education
+  kind: hub
+  tags: nstc recruit training nrotc officer training boot camp accession
+  description: Naval Service Training Command portal for accession and officer-development programs.
+  cac: false
+- name: United States Naval Community College
+  url: https://www.usncc.edu/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: usncc college associate degree enlisted education naval community college
+  description: Official United States Naval Community College programs and student resources.
+  cac: false
+- name: U.S. Naval Academy
+  url: https://www.usna.edu/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: usna naval academy officer commissioning education midshipmen
+  description: Official U.S. Naval Academy website and academic resources.
+  cac: false
+- name: Naval Postgraduate School
+  url: https://www.nps.edu/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: nps graduate school masters phd education officer enlisted
+  description: Official Naval Postgraduate School academic programs and resources.
+  cac: false
+- name: U.S. Naval War College
+  url: https://usnwc.edu/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: naval war college pme JPME graduate education strategy
+  description: Official U.S. Naval War College professional military education resources.
+  cac: false
+- name: MilGears
+  url: https://milgears.osd.mil/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: milgears credentials skills career pathways military occupations
+  description: DoD tool for translating military training and experience into credential and career pathways.
+  cac: false
+- name: Navy Career Training Continuum
+  url: https://www.netc.navy.mil/CTC/
+  group: Training & Education
+  category: Training & Education
+  kind: direct
+  tags: ctc career training continuum rrl ready relevant learning training modernization
+  description: Navy enterprise program for career-long individual training and learning modernization.
+  cac: false
+- name: Education Verification / JST Guidance
+  url: https://www.netc.navy.mil/Resources/Education-Verification/
+  group: Training & Education
+  category: Credentials & Education
+  kind: direct
+  tags: jst vmet transcript education verification degree military training
+  description: NETC guidance for JST, VMET and Navy education verification.
+  cac: false
+- name: MyNavy HR System Access
+  url: https://www.mynavyhr.navy.mil/Support-Services/MyNavy-Career-Center/System-Access/
+  group: Tools & IT
+  category: IT & Enterprise Services
+  kind: hub
+  tags: system access saar dd2875 amps ecrm bol nsips mna account restoration
+  description: Official system-access, SAAR, account-restoration and personnel-system guidance.
+  cac: false
+- name: Department of the Navy Forms and Publications
+  url: https://www.secnav.navy.mil/doni/
+  group: Portals & Directories
+  category: Portals & Directories
+  kind: hub
+  tags: doni secnav opnav forms publications directives repository
+  description: Department of the Navy issuances, forms and publications portal.
+  cac: false
+- name: U.S. Navy Regulations
+  url: https://www.mynavyhr.navy.mil/References/
+  group: Policy & References
+  category: References
+  kind: hub
+  tags: us navy regulations policy manuals publications references
+  description: MyNavy HR official references page, including U.S. Navy Regulations and personnel manuals.
   cac: false
