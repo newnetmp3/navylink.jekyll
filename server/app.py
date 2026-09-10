@@ -30,7 +30,7 @@ def slugify(value: str) -> str:
 
 def load_catalog() -> dict[str, dict[str, Any]]:
     items: list[dict[str, Any]] = []
-    for name in ("quick_links.yml", "extra_links.yml", "mnp_quick_links.generated.yml"):
+    for name in ("quick_links.yml", "extra_links.yml", "mnp_quick_links_generated.yml"):
         path = DATA_DIR / name
         if path.exists():
             with path.open("r", encoding="utf-8") as fh:
@@ -41,8 +41,9 @@ def load_catalog() -> dict[str, dict[str, Any]]:
     for item in items:
         if not isinstance(item, dict) or not item.get("name"):
             continue
-        item_id = slugify(str(item["name"]))
-        catalog[item_id] = item
+        item_id = str(item.get("id") or slugify(str(item["name"]))).strip()
+        if item_id:
+            catalog[item_id] = item
     return catalog
 
 
