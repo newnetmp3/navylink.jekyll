@@ -1,0 +1,106 @@
+name: Deploy Navylink to VPS
+
+# A deployment only starts after CI succeeds on a push to main.
+# Manual runs also build and validate the exact selected commit.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: navylink-vps-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      SSH_HOST: ${{ vars.NAVYLINK_SSH_HOST || '172.245.6.106' }}
+      SSH_USER: ${{ vars.NAVYLINK_SSH_USER || 'root' }}
+      SSH_PORT: ${{ vars.NAVYLINK_SSH_PORT || '22' }}
+
+    steps:
+      - name: Check out the exact commit being deployed
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+          persist-credentials: false
+
+      - name: Syntax-check deployment scripts and server
+        run: |
+          bash -n deploy/update.sh deploy/github-deploy-ssh.sh
+          python3 -m compileall -q server
+
+      - name: Install Ruby gems
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+
+      - name: Build site for production
+        env:
+          JEKYLL_ENV: production
+        run: |
+          bundle exec jekyll build
+          test -s _site/index.html
+
+      - name: Check main still points at the tested commit
+        id: latest
+        shell: bash
+        run: |
+          CURRENT="$(git ls-remote origin refs/heads/main | cut -f1)"
+          if [[ "$CURRENT" != "$DEPLOY_SHA" ]]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping obsolete CI run: main is now $CURRENT, not $DEPLOY_SHA" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure SSH key and pinned server identity
+        if: steps.latest.outputs.deploy == 'true'
+        env:
+          DEPLOY_KEY: ${{ secrets.NAVYLINK_SSH_PRIVATE_KEY }}
+          SERVER_HOST_KEY: ${{ secrets.NAVYLINK_SSH_KNOWN_HOSTS }}
+        shell: bash
+        run: |
+          if [[ -z "$DEPLOY_KEY" || -z "$SERVER_HOST_KEY" ]]; then
+            echo "::error::Set NAVYLINK_SSH_PRIVATE_KEY and NAVYLINK_SSH_KNOWN_HOSTS (see deploy/GITHUB_ACTIONS.md)."
+            exit 1
+          fi
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/navylink_actions_key"
+          printf '%s\n' "$SERVER_HOST_KEY" > "$HOME/.ssh/known_hosts"
+          chmod 0600 "$HOME/.ssh/navylink_actions_key" "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/navylink_actions_key" > /dev/null
+          lookup="$SSH_HOST"
+          if [[ "$SSH_PORT" != "22" ]]; then lookup="[$SSH_HOST]:$SSH_PORT"; fi
+          if ! ssh-keygen -F "$lookup" -f "$HOME/.ssh/known_hosts" > /dev/null; then
+            echo "::error::Pinned known_hosts secret has no entry for the configured host/port."
+            exit 1
+          fi
+
+      - name: Update VPS and verify health
+        if: steps.latest.outputs.deploy == 'true'
+        shell: bash
+        run: |
+          ssh -T \
+            -i "$HOME/.ssh/navylink_actions_key" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            -o ConnectTimeout=15 \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" "deploy $DEPLOY_SHA"
