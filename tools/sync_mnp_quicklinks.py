@@ -332,6 +332,18 @@ def main() -> int:
             if len(record.get("description", "")) > len(prev.get("description", "")):
                 prev["description"] = record["description"]
 
+    # A pagination regression can return the same first page eight times:
+    # the parsed-record count would look correct while most links are gone.
+    minimum_unique = max(1, math.ceil(args.min_records * 0.75))
+    if expected:
+        minimum_unique = max(minimum_unique, math.ceil(expected * 0.65))
+    if len(merged) < minimum_unique:
+        raise SystemExit(
+            f"Refusing update: only {len(merged)} distinct destinations from "
+            f"{len(records)} parsed Quick Links (minimum {minimum_unique}). "
+            "Pagination or source markup may have changed."
+        )
+
     existing_urls, existing_names = load_existing()
     generated: list[dict[str, object]] = []
     already_covered = 0
