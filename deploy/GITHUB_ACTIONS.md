@@ -87,6 +87,49 @@ If your VPS differs, configure repository **Actions variables**
 `NAVYLINK_SSH_HOST`, `NAVYLINK_SSH_USER`, and `NAVYLINK_SSH_PORT`.
 The forced-command installation above is written for the root SSH user.
 
+## Updating the official MyNavy Portal Quick Links catalog
+
+The historical `my.navy.mil/quick-links.html` destination now redirects/migrates
+to the public `www.mn3p.navy.mil` portal. The importer reads the official
+public Quick Link **search results** (not the JavaScript-only placeholder cards
+on the landing page). A past run from GitHub Actions received HTTP 403 from
+the Navy site. That is a server-side restriction, **not** missing Python
+dependencies. Do not disable TLS validation or try to bypass a CAC login.
+
+The **Sync MyNavy Portal Quick Links** action attempts the public endpoint
+directly at **07:17 UTC daily** and has an Actions → Run workflow button.
+If the Navy refuses GitHub's IP, it uses the same restricted SSH key described
+above to request `sync-mnp` from the VPS. If the VPS is also blocked, the run
+fails without replacing the previous snapshot. No login cookies or CAC
+credentials are collected or stored.
+
+Before the first automatic sync, run `navylink-update` on the VPS so its
+restricted SSH command recognizes `sync-mnp`; complete the GitHub SSH secrets
+setup above. You can test network access from the VPS without modifying files:
+
+```bash
+cd /opt/navylink
+.venv/bin/python tools/sync_mnp_quicklinks.py --audit --min-records 350
+```
+
+A successful import commits `_data/mnp_quick_links_generated.yml` and its
+coverage report on `main`, explicitly dispatches CI (bot-token commits do
+not trigger ordinary push events), and the existing VPS deploy workflow runs
+after CI succeeds. Existing hand-curated entries in `quick_links.yml` and
+`extra_links.yml` are preserved rather than silently overwritten.
+
+If *both* GitHub and VPS cannot reach the official public site, a fallback
+for a **trusted browser-exported HTML set** is available:
+
+```bash
+python tools/sync_mnp_quicklinks.py --html-dir /path/to/mnp-pages --min-records 350
+```
+
+Save each page of the official Quick Link search-results pagination as a
+separate `.html` file in the directory. Import refuses an incomplete catalog
+and does not treat the empty example cards on the JavaScript landing page as
+real destinations. You can review the generated YAML and commit it normally.
+
 ## 5. Try it
 
 Navigate to **Actions → Deploy Navylink to VPS → Run workflow** and select
