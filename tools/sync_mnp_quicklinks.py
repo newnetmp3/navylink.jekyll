@@ -10,6 +10,8 @@ from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urljoin, urlsplit, urlunsplit
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import yaml
 from bs4 import BeautifulSoup
 
@@ -59,11 +61,18 @@ def canonical_url(value: str) -> str:
     value = clean_space(value)
     if not value:
         return ""
-    if value.startswith("/"):
+    if value.startswith("//"):
+        value = "https:" + value
+    elif value.startswith("/"):
         value = urljoin("https://www.mn3p.navy.mil", value)
     parts = urlsplit(value)
-    scheme = (parts.scheme or "https").lower()
+    scheme = parts.scheme.lower()
     host = parts.netloc.lower()
+    if scheme not in {"http", "https"} or not parts.hostname:
+        return ""
+    # Refuse example/placeholder destinations from the MNP client-side shell.
+    if parts.hostname.lower() in {"www.domain.com", "domain.com", "internal.site", "private.site"}:
+        return ""
     path = re.sub(r"/{2,}", "/", parts.path or "/")
     if path != "/":
         path = path.rstrip("/")
@@ -228,32 +237,60 @@ def build_tags(name: str, mnp_categories: str) -> str:
     return " ".join(out[:40])
 
 
-def fetch_catalog(session: requests.Session) -> tuple[list[dict[str, str]], int | None]:
+def fetch_catalog(
+    session: requests.Session, *, html_dir: Path | None = None
+) -> tuple[list[dict[str, str]], int | None]:
     records: list[dict[str, str]] = []
     expected_quick: int | None = None
     total_results: int | None = None
     pages = 1
 
+    if html_dir is not None:
+        page_paths = sorted(html_dir.glob("*.html"))
+        if not page_paths:
+            raise SystemExit(f"No .html pages found in {html_dir}")
+        pages = len(page_paths)
+    else:
+        page_paths = []
+
     for page in range(1, 31):
         if page > pages:
             break
-        response = session.get(
-            SEARCH_URL,
-            params={"type": QUICK_LINK_TYPE, "delta": DELTA, "start": page, "q": ""},
-            timeout=30,
-        )
-        response.raise_for_status()
-        text = BeautifulSoup(response.text, "html.parser").get_text(" ", strip=True)
+        if html_dir is not None:
+            if page > len(page_paths):
+                break
+            html = page_paths[page - 1].read_text(encoding="utf-8")
+        else:
+            try:
+                response = session.get(
+                    SEARCH_URL,
+                    params={"type": QUICK_LINK_TYPE, "delta": DELTA, "start": page, "q": ""},
+                    timeout=45,
+                )
+                response.raise_for_status()
+            except requests.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 403:
+                    raise SystemExit(
+                        "MyNavy Portal refused this runner (HTTP 403). "
+                        "GitHub Actions cannot scrape it from this IP; "
+                        "use the restricted VPS sync fallback or local HTML import."
+                    ) from exc
+                raise SystemExit(f"Cannot fetch MyNavy Quick Links page {page}: {exc}") from exc
+            except requests.RequestException as exc:
+                raise SystemExit(f"Cannot fetch MyNavy Quick Links page {page}: {exc}") from exc
+            html = response.text
+
+        text = BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
         quick_count, overall_count = extract_counts(text)
         if quick_count:
             expected_quick = quick_count
         if overall_count:
             total_results = overall_count
-        if page == 1:
+        if page == 1 and html_dir is None:
             basis = total_results or expected_quick or DELTA
             pages = max(1, min(30, math.ceil(basis / DELTA)))
 
-        page_records = parse_page(response.text)
+        page_records = parse_page(html)
         records.extend(page_records)
         print(f"MNP page {page}/{pages}: {len(page_records)} Quick Link records parsed", file=sys.stderr)
 
@@ -264,12 +301,18 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Sync all public MyNavy Portal Quick Links into Navylink.")
     parser.add_argument("--audit", action="store_true", help="Audit only; do not write generated YAML.")
     parser.add_argument("--min-records", type=int, default=350, help="Minimum parsed record sanity threshold.")
+    parser.add_argument(
+        "--html-dir", type=Path, default=None,
+        help="Use downloaded, paginated official MNP search HTML files if the public server blocks automation.",
+    )
     args = parser.parse_args()
 
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT, "Accept": "text/html,application/xhtml+xml"})
+    retry = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
+    session.mount("https://", HTTPAdapter(max_retries=retry))
 
-    records, expected = fetch_catalog(session)
+    records, expected = fetch_catalog(session, html_dir=args.html_dir)
     if len(records) < args.min_records:
         raise SystemExit(f"Refusing update: parsed only {len(records)} MNP Quick Link records (minimum {args.min_records}).")
     if expected and len(records) < int(expected * 0.90):
@@ -319,7 +362,7 @@ def main() -> int:
         })
 
     summary = {
-        "source": SEARCH_URL,
+        "source": SEARCH_URL if args.html_dir is None else "Local official MyNavy Portal HTML export",
         "reported_quick_link_records": expected,
         "parsed_records": len(records),
         "unique_mnp_destinations": len(merged),
