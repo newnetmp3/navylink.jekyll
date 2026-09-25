@@ -165,26 +165,16 @@
     document.querySelector('#link-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }));
 
-  const resourceNav = document.querySelector('.resource-nav');
   const navMenus = [...document.querySelectorAll('.nav-menu')];
 
-  function positionOpenNavMenus() {
-    if (!resourceNav) return;
-    const navBottom = resourceNav.getBoundingClientRect().bottom;
-    navMenus.filter(menu => menu.open).forEach(menu => {
-      const rowOffset = Math.max(0, Math.ceil(navBottom - menu.getBoundingClientRect().bottom));
-      menu.style.setProperty('--nav-row-offset', `${rowOffset}px`);
-    });
-  }
-
+  // Behave like an anchored context menu: open over the page, not below the
+  // whole navigation bar; only one menu can be open at a time.
   navMenus.forEach(menu => menu.addEventListener('toggle', () => {
     if (!menu.open) return;
     navMenus.forEach(other => {
       if (other !== menu) other.removeAttribute('open');
     });
-    positionOpenNavMenus();
   }));
-  window.addEventListener('resize', positionOpenNavMenus);
 
   document.addEventListener('click', event => {
     if (!event.target.closest('.resource-nav')) {

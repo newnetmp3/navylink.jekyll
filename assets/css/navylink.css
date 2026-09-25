@@ -5,21 +5,41 @@
 .resource-nav .nav-home,.resource-nav .nav-menu>summary{background-color:#fff;color:#29425c}
 .resource-nav .nav-home:hover,.resource-nav .nav-home.active,.resource-nav .nav-menu[open]>summary{background-color:var(--navy);color:#fff}
 
-/* Keep open dropdowns above sibling nav items and the sticky Most Used section.
-   For a wrapped desktop nav, place panels below BOTH nav rows. */
-.resource-nav{z-index:100}
-.resource-nav .nav-menu[open]{z-index:2}
+/* Context-menu behavior: panels float over the remaining navigation rows and
+   page content. Never move a menu below the entire wrapped navigation bar. */
+.resource-nav{
+  z-index:100;
+  overflow:visible;
+}
+.resource-nav .nav-menu{
+  position:relative;
+}
+.resource-nav .nav-menu[open]{
+  z-index:101;
+}
 .resource-nav .nav-menu-panel{
-  top:calc(100% + var(--nav-row-offset, 0px) + .45rem);
-  z-index:3;
+  position:absolute;
+  top:calc(100% + .35rem);
+  z-index:102;
+  max-height:min(65vh, 420px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
 }
 @media(max-width:980px){
-  /* Tablet/mobile: anchor the full-width panel below the whole nav, not a single row. */
-  .resource-nav .nav-menu{position:static}
+  /* Preserve a trigger-anchored overlay on tablet and phone, too. */
+  .resource-nav .nav-menu{
+    position:relative;
+  }
   .resource-nav .nav-menu-panel{
     position:absolute;
-    left:.5rem!important;
-    right:.5rem!important;
-    top:calc(100% + .45rem);
+    left:0!important;
+    right:auto!important;
+    top:calc(100% + .35rem);
+    width:min(300px, calc(100vw - 32px));
+    min-width:0;
+  }
+  .resource-nav .nav-menu-panel-right{
+    left:auto!important;
+    right:0!important;
   }
 }
