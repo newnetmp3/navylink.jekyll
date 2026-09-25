@@ -46,6 +46,7 @@ bundle exec jekyll build
 install -m 0644 "$APP_DIR/deploy/navylink.service" /etc/systemd/system/navylink.service
 install -m 0644 "$APP_DIR/deploy/Caddyfile.ip" /etc/caddy/Caddyfile
 install -m 0755 "$APP_DIR/deploy/update.sh" /usr/local/sbin/navylink-update
+install -m 0755 "$APP_DIR/deploy/github-deploy-ssh.sh" /usr/local/sbin/navylink-github-deploy
 
 systemctl daemon-reload
 systemctl enable --now navylink.service
