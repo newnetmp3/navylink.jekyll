@@ -165,12 +165,26 @@
     document.querySelector('#link-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }));
 
-  document.querySelectorAll('.nav-menu').forEach(menu => menu.addEventListener('toggle', () => {
+  const resourceNav = document.querySelector('.resource-nav');
+  const navMenus = [...document.querySelectorAll('.nav-menu')];
+
+  function positionOpenNavMenus() {
+    if (!resourceNav) return;
+    const navBottom = resourceNav.getBoundingClientRect().bottom;
+    navMenus.filter(menu => menu.open).forEach(menu => {
+      const rowOffset = Math.max(0, Math.ceil(navBottom - menu.getBoundingClientRect().bottom));
+      menu.style.setProperty('--nav-row-offset', `${rowOffset}px`);
+    });
+  }
+
+  navMenus.forEach(menu => menu.addEventListener('toggle', () => {
     if (!menu.open) return;
-    document.querySelectorAll('.nav-menu[open]').forEach(other => {
+    navMenus.forEach(other => {
       if (other !== menu) other.removeAttribute('open');
     });
+    positionOpenNavMenus();
   }));
+  window.addEventListener('resize', positionOpenNavMenus);
 
   document.addEventListener('click', event => {
     if (!event.target.closest('.resource-nav')) {
