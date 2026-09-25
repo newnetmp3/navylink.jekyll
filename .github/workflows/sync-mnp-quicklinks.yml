@@ -2,9 +2,12 @@ name: Sync MyNavy Portal Quick Links
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '17 7 * * *'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: sync-mnp-quicklinks
@@ -13,35 +16,129 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    env:
+      SSH_HOST: ${{ vars.NAVYLINK_SSH_HOST || '172.245.6.106' }}
+      SSH_USER: ${{ vars.NAVYLINK_SSH_USER || 'root' }}
+      SSH_PORT: ${{ vars.NAVYLINK_SSH_PORT || '22' }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install sync dependencies
         run: python -m pip install PyYAML==6.0.2 requests==2.32.5 beautifulsoup4==4.13.5
 
-      - name: Sync full MNP Quick Links catalog
+      - name: Try the official public site from GitHub Actions
+        id: direct
+        continue-on-error: true
         run: python tools/sync_mnp_quicklinks.py --min-records 350
+
+      - name: Configure pinned SSH fallback
+        if: steps.direct.outcome == 'failure'
+        shell: bash
+        env:
+          DEPLOY_KEY: ${{ secrets.NAVYLINK_SSH_PRIVATE_KEY }}
+          SERVER_HOST_KEY: ${{ secrets.NAVYLINK_SSH_KNOWN_HOSTS }}
+        run: |
+          if [[ -z "$DEPLOY_KEY" || -z "$SERVER_HOST_KEY" ]]; then
+            echo "::error::MyNavy Portal blocks GitHub runners or changed markup. To try the VPS IP, configure NAVYLINK_SSH_PRIVATE_KEY and NAVYLINK_SSH_KNOWN_HOSTS per deploy/GITHUB_ACTIONS.md."
+            exit 1
+          fi
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/navylink_actions_key"
+          printf '%s\n' "$SERVER_HOST_KEY" > "$HOME/.ssh/known_hosts"
+          chmod 0600 "$HOME/.ssh/navylink_actions_key" "$HOME/.ssh/known_hosts"
+          ssh-keygen -y -f "$HOME/.ssh/navylink_actions_key" >/dev/null
+          lookup="$SSH_HOST"
+          if [[ "$SSH_PORT" != "22" ]]; then lookup="[$SSH_HOST]:$SSH_PORT"; fi
+          ssh-keygen -F "$lookup" -f "$HOME/.ssh/known_hosts" >/dev/null || {
+            echo "::error::Known-hosts secret is missing the VPS host and port."
+            exit 1
+          }
+
+      - name: Request official Quick Links via the VPS
+        if: steps.direct.outcome == 'failure'
+        shell: bash
+        run: |
+          ssh -T \
+            -i "$HOME/.ssh/navylink_actions_key" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
+            -o ConnectTimeout=15 \
+            -p "$SSH_PORT" \
+            "$SSH_USER@$SSH_HOST" sync-mnp > "$RUNNER_TEMP/mnp-sync.json"
+
+      - name: Validate VPS snapshot and import only the catalog files
+        if: steps.direct.outcome == 'failure'
+        env:
+          MNP_SYNC_PAYLOAD: ${{ runner.temp }}/mnp-sync.json
+        shell: bash
+        run: |
+          python - <<'PY'
+          import base64
+          import json
+          import os
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import yaml
+
+          payload = json.loads(Path(os.environ["MNP_SYNC_PAYLOAD"]).read_text())
+          filenames = ("mnp_quick_links_generated.yml", "mnp_quick_links_meta.yml")
+          if set(payload) != set(filenames):
+              raise SystemExit("Unexpected VPS snapshot format")
+          decoded = {}
+          for filename in filenames:
+              value = base64.b64decode(payload[filename], validate=True)
+              if not value or len(value) > 2_000_000:
+                  raise SystemExit("Empty or oversized VPS snapshot")
+              decoded[filename] = value.decode("utf-8")
+          links = yaml.safe_load(decoded[filenames[0]])
+          meta = yaml.safe_load(decoded[filenames[1]])
+          if not isinstance(links, list) or not isinstance(meta, dict):
+              raise SystemExit("Invalid MyNavy catalog YAML")
+          if meta.get("parsed_records", 0) < 350 or meta.get("unique_mnp_destinations", 0) < 300:
+              raise SystemExit("VPS MyNavy snapshot is incomplete")
+          if meta.get("generated_missing_destinations") != len(links):
+              raise SystemExit("MyNavy snapshot counts do not match")
+          for item in links:
+              if not isinstance(item, dict) or not all(item.get(k) for k in ("id", "name", "url")):
+                  raise SystemExit("Invalid MyNavy catalog entry")
+              parsed = urlsplit(item["url"])
+              if parsed.scheme not in ("http", "https") or not parsed.hostname:
+                  raise SystemExit("Invalid destination in official catalog")
+          root = Path("_data")
+          for filename in filenames:
+              (root / filename).write_text(decoded[filename], encoding="utf-8")
+          print(f"Imported {meta['parsed_records']} official records, {len(links)} additional destinations")
+          PY
 
       - name: Show coverage audit
         run: cat _data/mnp_quick_links_meta.yml
 
-      - name: Commit updated snapshot
+      - name: Commit changes and trigger CI for bot-authored snapshot
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name 'navylink-mnp-sync[bot]'
           git config user.email 'navylink-mnp-sync[bot]@users.noreply.github.com'
           git add _data/mnp_quick_links_generated.yml _data/mnp_quick_links_meta.yml
           if git diff --cached --quiet; then
-            echo 'MNP Quick Links snapshot is already current.'
+            echo 'The official Quick Links snapshot is already current.'
             exit 0
           fi
           git commit -m 'Refresh MyNavy Portal Quick Links snapshot'
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
+          # GITHUB_TOKEN pushes do not cause normal push workflows. Dispatch CI
+          # explicitly; successful CI then initiates the existing VPS deployment.
+          gh workflow run ci.yml --ref main
